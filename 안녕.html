@@ -27,7 +27,7 @@
       transform: translate(-50%, -50%);
       z-index: 1;
       border: 1px solid rgba(200, 184, 154, 0.25);
-      border-radius: 4px;
+      border-radius: 0;
       overflow: hidden;
       display: none;
       pointer-events: none;
@@ -89,7 +89,7 @@
       padding: 8px 18px;
       background: rgba(10, 8, 4, 0.75);
       border: 1px solid rgba(200, 184, 154, 0.35);
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 0.95rem;
       letter-spacing: 0.08em;
       color: #ffe6b4;
@@ -100,6 +100,8 @@
       text-shadow: 0 0 10px rgba(255, 230, 180, 0.4);
       white-space: nowrap;
     }
+    #bubble { display: none !important; }
+
     #bubble.show {
       opacity: 1;
       transform: translateY(0);
@@ -189,12 +191,12 @@
       color: rgba(200, 184, 154, 0.85);
       background: rgba(10, 8, 4, 0.65);
       padding: 6px 14px;
-      border-radius: 20px;
+      border-radius: 0;
       border: 1px solid rgba(200, 184, 154, 0.2);
     }
     #hand-dot {
       width: 8px; height: 8px;
-      border-radius: 50%;
+      border-radius: 0;
       background: #666;
       transition: background 0.25s, box-shadow 0.25s;
     }
@@ -278,7 +280,7 @@
       border: 1px solid rgba(200, 184, 154, 0.4);
       background: rgba(200, 184, 154, 0.08);
       color: #c8b89a;
-      border-radius: 25px;
+      border-radius: 0;
       font-size: 0.85rem;
       cursor: pointer;
       text-decoration: none;
@@ -302,7 +304,7 @@
       color: rgba(200, 184, 154, 0.7);
       background: rgba(10, 8, 4, 0.65);
       border: 1px solid rgba(200, 184, 154, 0.2);
-      border-radius: 20px;
+      border-radius: 0;
       text-decoration: none;
       transition: all 0.2s;
     }
@@ -316,7 +318,7 @@
       color: rgba(255,255,255,0.85);
       background: rgba(10,8,4,0.65);
       border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 20px;
+      border-radius: 0;
       text-decoration: none;
     }
     #back-to-playground:hover {
@@ -548,7 +550,7 @@ function 페이지사운드초기화() {
     if (페이지배경음.readyState >= 1) 재개위치설정();
   }
 
-  ['btn', 'mbk', 'bird'].forEach(function (이름) {
+  ['btn', 'mbk', 'bird', 'mend2-1', 'mend2-2', 'mend2-3'].forEach(function (이름) {
     효과음파일[이름] = new Audio(이름 + '.mp3');
     효과음파일[이름].preload = 'auto';
   });
@@ -684,6 +686,8 @@ function 걷기시작() {
 function 인사하기시작() {
   if (상태 === "greet" || 상태 === "fading" || 상태 === "ended") return;
   상태 = "greet";
+  const 돌아보기소리 = ['mend2-1', 'mend2-2', 'mend2-3'][Math.floor(Math.random() * 3)];
+  오디오효과재생(돌아보기소리, 0.7);
 
   // 걷기 멈춤 (현재 스케일 위치 그대로 고정!)
   if (걷기타이머) { clearInterval(걷기타이머); 걷기타이머 = null; }

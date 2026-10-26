@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -115,13 +115,13 @@
 
     #ply-text-entry {
       position: fixed;
-      top: calc(50% - 8.25vw - 8px);
+      top: max(120px, calc(50vh - 8.25vw - 24vh - 12px));
       left: 50%;
-      transform: translate(-50%, -300%);
+      transform: translateX(-50%);
       z-index: 3;
       display: none;
       width: 22vw;
-      max-height: 18vh;
+      max-height: max(72px, min(24vh, calc(50vh - 8.25vw - 136px)));
       box-sizing: border-box;
       overflow-y: auto;
       color: #7d7d7d;
@@ -285,14 +285,204 @@
       pointer-events: auto;
     }
 
+    .photo-reader-layout {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-height: 90vh;
+    }
+
     #photo-reader-image {
       display: block;
-      max-width: min(88vw, 1200px);
-      max-height: 88vh;
+      max-width: min(61.6vw, 840px);
+      max-height: 61.6vh;
       width: auto;
       height: auto;
       object-fit: contain;
       cursor: default;
+    }
+
+    .photo-reader-image-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    #photo-reader-close {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      padding: 0 0 3px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      background: rgba(10, 8, 4, 0.72);
+      color: #fff;
+      font: 300 27px/1 Arial, sans-serif;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    #photo-reader-close:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translate(-50%, 0) scale(1.08);
+    }
+
+    .photo-reader-copy {
+      display: none;
+    }
+
+    #photo-reader.has-copy .photo-reader-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(4px, 0.5vw, 8px);
+      width: min(98vw, 1800px);
+    }
+
+    #photo-reader.has-copy .photo-reader-image-wrap {
+      width: 100%;
+      min-width: 0;
+    }
+
+    #photo-reader.has-copy #photo-reader-image {
+      width: 100%;
+      max-width: none;
+      height: 61.6vh;
+      max-height: 61.6vh;
+      transform: none;
+    }
+
+    #photo-reader.has-copy .photo-reader-copy {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(8px, 1.2vh, 14px);
+      width: 100%;
+      height: 61.6vh;
+      max-height: 61.6vh;
+      min-width: 0;
+    }
+
+    #photo-reader-title,
+    #photo-reader-body {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0 0 10px;
+      border: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0;
+      outline: none;
+      background: transparent;
+      color: #f0eee9;
+      font: inherit;
+      text-align: left;
+      resize: none;
+    }
+
+    #photo-reader-title {
+      flex: 0 0 auto;
+      font-size: clamp(0.95rem, 1.3vw, 1.45rem);
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    #photo-reader-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      overflow-y: hidden;
+      font-size: clamp(0.68rem, 0.82vw, 0.88rem);
+      line-height: 1.42;
+      white-space: pre-wrap;
+    }
+
+    #photo-reader-title::placeholder,
+    #photo-reader-body::placeholder {
+      color: rgba(240, 238, 233, 0.45);
+    }
+
+    @media (max-width: 760px) {
+      #photo-reader.has-copy .photo-reader-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 22vh minmax(0, 1fr);
+        gap: 8px;
+        width: 94vw;
+        height: 88vh;
+        max-height: 88vh;
+      }
+
+      #photo-reader.has-copy .photo-reader-image-wrap {
+        height: 22vh;
+      }
+
+      #photo-reader.has-copy #photo-reader-image {
+        height: 22vh;
+        max-height: 22vh;
+        transform: none;
+      }
+
+      #photo-reader.has-copy .photo-reader-copy {
+        height: 64vh;
+        max-height: 64vh;
+        gap: 6px;
+      }
+
+      #photo-reader-title {
+        font-size: 0.82rem;
+      }
+
+      #photo-reader-body {
+        min-height: 0;
+        max-height: none;
+        overflow-y: hidden;
+        font-size: 0.64rem;
+        line-height: 1.32;
+      }
+    }
+
+    #spread-instruction {
+      position: fixed;
+      top: calc(50% - 8.25vw - 12px);
+      left: 50%;
+      transform: translate(-50%, -100%);
+      z-index: 3;
+      width: 22vw;
+      color: rgba(240, 238, 233, 0.72);
+      font-size: clamp(0.65rem, 0.9vw, 0.85rem);
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      text-align: center;
+      pointer-events: none;
+      animation: spread-instruction-pulse 4s ease-in-out infinite;
+      transition: opacity 0.9s ease;
+    }
+
+    @keyframes spread-instruction-pulse {
+
+      0%,
+      100% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 0.62;
+      }
+    }
+
+    #spread-instruction.is-scattered-hidden {
+      animation: none;
+      opacity: 0;
     }
 
     #hand-art {
@@ -665,8 +855,13 @@
       letter-spacing: 0.04em;
       color: #b8b8b8;
       text-shadow: none;
-      transition: none;
+      opacity: 1;
+      transition: opacity 0.8s ease;
       white-space: nowrap;
+    }
+
+    #playground-nav.is-scattered-hidden .playground-label {
+      opacity: 0;
     }
 
     .playground-btn:hover .playground-label,
@@ -789,10 +984,44 @@
         animation-duration: 90s;
       }
     }
+
+    #start-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+      background: #0a0804;
+      color: #f2f0eb;
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      letter-spacing: 0.04em;
+      text-align: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #start-screen.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #start-screen:focus-visible {
+      outline: none;
+    }
   </style>
 </head>
 
 <body>
+  <div id="start-screen" role="button" tabindex="0" aria-label="우리의 기억은 우레탄 밑에 존재한다">
+    <span>우리의 기억은 우레탄 밑에 존재한다</span>
+  </div>
   <aside id="left-film-strip" aria-hidden="true">
     <div class="film-strip-track">
       <div class="film-strip-set">
@@ -816,10 +1045,11 @@
   <!-- ── 왼쪽 프로젝트 소개 ── -->
   <aside id="project-intro" aria-label="프로젝트 소개">
     <h1>모래랑<br>친구와<br>이제<br>안녕</h1>
-    <p class="intro-lead">우리는 그날이 마지막인줄 모르고 헤어졌다.</p>
+    <p class="intro-lead">우리는 그날이 마지막인줄 모르고 헤어졌다.<br></p>
+    <br>
     <p>마지막으로 놀았던 모래놀이터, 일명 내 동네에선 뱃놀이터라고 불리던 장소는 수년이 흐른 지금, 인공구조물과 포장바닥으로 뒤덮였다. 우리의 기억들은 탄성바닥 밑에 한숨쉰다.</p>
     <p class="project-description">&lt;모래랑 친구와 이제 안녕&gt;은 사라져 가는 모래놀이터의 풍경과 감각적 기억을 인터랙티브 웹으로 재구성하는 프로젝트다. 사용자는 화면 속 입자를
-      움직이고 흩트리며, 손으로 만질 수 없는 디지털 공간에서 모래의 질감과 놀이의 흔적을 경험한다. 흩어진 입자는 저절로 돌아오지 않고, 그 위에 남은 기억은 사용자의 움직임에 따라 모습을 드러낸다.</p>
+      움직이고 흩트리며, 손으로 만질 수 없는 디지털 공간에서 모래의 질감과 놀이의 흔적을 경험한다. 흩어진 입자는 저절로 돌아오지 않고,그 위에 기억은 사용자의 움직임에 따라 모습을 드러낸다.</p>
   </aside>
 
 
@@ -833,18 +1063,18 @@
           <div class="spinner-ring"></div>
         </div>
       </div>
-      <span class="playground-label">기존 모래놀이터기구</span>
+      <span class="playground-label">모래놀이터</span>
     </button>
 
-    <!-- 2. 모래놀이터의 그네 -->
-    <button class="playground-btn" id="btn-ply-1" onclick="놀이터모델선택(1)" aria-pressed="false" title="모래놀이터의 그네">
+    <!-- 2. 모래장 그네 -->
+    <button class="playground-btn" id="btn-ply-1" onclick="놀이터모델선택(1)" aria-pressed="false" title="모래장 그네">
       <div class="playground-circle" id="circle-1">
-        <img id="playground-thumb-1" class="circle-thumb" alt="모래놀이터의 그네 미리보기" />
+        <img id="playground-thumb-1" class="circle-thumb" alt="모래장 그네 미리보기" />
         <div class="circle-spinner" id="spinner-1">
           <div class="spinner-ring"></div>
         </div>
       </div>
-      <span class="playground-label">모래놀이터의 그네</span>
+      <span class="playground-label">모래장 그네</span>
     </button>
 
     <!-- 3. 모래놀이장 -->
@@ -865,6 +1095,7 @@
   <div id="webcam-wrapper">
     <video id="webcam" autoplay muted playsinline></video>
   </div>
+  <div id="spread-instruction" aria-hidden="true">두 손을 펴서 모래를 펼쳐보세요</div>
   <div id="ply-text-entry" contenteditable="true" role="textbox" aria-label="선택한 모래놀이터 문구 입력" spellcheck="false"></div>
   <a id="hand-next-link" href="안녕.html" aria-label="다음 장면: 안녕"><img id="hand-art-source" src="손.png" alt=""
       draggable="false"><canvas id="hand-art" width="512" height="512" aria-hidden="true"></canvas><img
@@ -886,7 +1117,18 @@
     <div class="spinner-ring"></div>
   </div>
   <button id="music-toggle" type="button" aria-label="음악 끄기" aria-pressed="true">♫</button>
-  <div id="photo-reader" aria-hidden="true"><img id="photo-reader-image" alt="선택한 추억 사진"></div>
+  <div id="photo-reader" aria-hidden="true">
+    <div class="photo-reader-layout">
+      <div class="photo-reader-image-wrap">
+        <img id="photo-reader-image" alt="선택한 추억 사진">
+      </div>
+      <div class="photo-reader-copy">
+        <input id="photo-reader-title" type="text" aria-label="사진 제목" placeholder="제목을 입력하세요">
+        <textarea id="photo-reader-body" aria-label="사진 본문" placeholder="본문을 입력하세요"></textarea>
+      </div>
+      <button id="photo-reader-close" type="button" aria-label="사진 닫기" onclick="사진리더닫기()">×</button>
+    </div>
+  </div>
 
   <div id="overlay">
     <div id="status-msg"></div>
@@ -902,7 +1144,7 @@
     🖐 <b>한 손 펼치고 이동</b> : 부드러운 회전 (멈추면 감속)<br>
     ✊ <b>한 손 주먹</b> : 회전 정지 및 현재 각도 유지<br>
     ☝️ <b>한 손가락</b> : 입자 사르르 퍼뜨리기<br>
-    🖐🖐 <b>두 손 펼치기</b> : 사방으로 영구 흩어짐 & 추억 사진 등장<br>
+    🖐🖐 <b>두 손 펼치기</b> : 모래 펼치기<br>
     🤲 <b>두 손 모으기 (2초)</b> : 전체 초기화 (원래대로 복구)<br>
     <span style="opacity:0.75;font-size:0.9em">🖱️ <b>마우스 드래그</b> : 부드러운 회전 (R키: 리셋)</span>
   </div>
@@ -999,6 +1241,8 @@
     let 사진그룹 = null;
     let 사진스프라이트들 = [];
     let 사진리더스프라이트 = null;
+    let 사진리더활성인덱스 = -1;
+
     let 사진선택월드좌표 = null;
     let 사진선택화면좌표 = null;
     let 사진마우스호버 = null;
@@ -1006,8 +1250,34 @@
     const 사진파일목록 = [
       'test1.jpg', 'test2.jpg', 'test3.jpg',
       'test4.jpg', 'test5.jpg', 'test6.jpg',
-      'test7.jpg', 'test8.jpg', 'test9.jpg'
+      'test7.jpg', 'test8.jpg', 'test9.jpg',
+      'test10.jpg', 'test11.jpg', 'test12.jpg'
     ];
+    const 사진별제목본문 = 사진파일목록.map(function () { return { 제목: '', 본문: '' }; });
+    사진별제목본문[6] = {
+      제목: '우리가 가지고 놀던 모래놀이도구',
+      본문: `생각해보면 모래놀이 도구는 내 생애 첫 ‘장비’였다. 형형색색의 플라스틱 삽, 양동이, 그리고 별 모양이나 게 모양으로 파인 틀 같은 것들 말이다. 그 조잡하고 가벼운 도구들만 쥐어지면 밋밋했던 모래사장은 거대한 공사장이자 요새가 되었다. 축축한 모래를 꾹꾹 눌러 담아 양동이를 뒤집었을 때, 무너지지 않고 완벽한 원기둥 모양이 툭 떨어지던 그 순간의 쾌감은 잊을 수 없다. 도구는 단순했지만, 그것이 만들어내는 상상의 세계는 무한했다.
+
+하지만 어느 순간부터 그 도구들은 갈 곳을 잃어버렸다. 동네 놀이터에서 모래가 사라지면서, 화려한 색감의 삽과 양동이는 베란다 구석에서 먼지만 뒤집어쓰는 애물단지가 되었다. 흙을 퍼낼 일 없는 플라스틱 삽을 보면서 가끔 서글퍼진다. 정해진 버튼을 누르면 정해진 소리가 나는 요즘 장난감들과 달리, 모래놀이 도구는 무엇이든 될 수 있는 백지장 같은 물건이었기 때문이다.`
+    };
+    사진별제목본문[7] = {
+      제목: '우레탄 진실',
+      본문: `모래가 밀려난 자리를 차지한 것은 폭신하고 쨍한 색감의 우레탄 블록이었다. 관리의 편의성과 아이들의 '안전'이라는 명분 아래, 놀이터 바닥은 빠르게 합성 고무로 뒤덮였다. 푹신한 바닥은 아이들이 넘어져도 무릎이 깨지지 않게 막아주었고, 길고양이들의 배설물이나 유리 조각에 대한 어른들의 공포를 말끔히 지워주었다. 시각적으로도 깔끔해 보였으니, 처음 우레탄 바닥이 도입되었을 때만 해도 이는 놀이터의 혁신이자 진보로 여겨졌다.
+
+하지만 조금만 비판적으로 들여다보면 우레탄의 민낯은 꽤나 폭력적이다. 한여름 뙤약볕이 내리쬘 때 우레탄 바닥에서 올라오는 그 매스꺼운 고무 타는 냄새를 맡아본 적이 있을 것이다. 실제로 많은 우레탄 바닥재에서 기준치를 초과하는 중금속이나 환경호르몬이 검출되어 사회적 논란이 된 바 있다. 아이들을 다치지 않게 하겠다는 명분으로 깐 바닥이, 오히려 눈에 보이지 않는 유해 물질로 아이들의 호흡기와 피부를 서서히 위협하고 있었던 셈이다.
+
+더욱 치명적인 것은 우레탄이 아이들의 감각을 획일화시켰다는 점이다. 우레탄 바닥은 그저 밟고 지나가는 2차원의 평면일 뿐, 아이들이 만지고 형태를 변형시킬 수 있는 대상이 아니다. 위험 요소를 완벽히 통제하겠다는 어른들의 강박이 만들어낸 이 인공의 카펫 위에서, 아이들은 흙먼지를 뒤집어쓰며 자연과 교감할 권리를 빼앗겼다. 넘어지면 아프다는 당연한 자연의 법칙조차 거세된 이 푹신한 감옥은, 과연 누구를 위한 공간인지 묻지 않을 수 없다.`
+    };
+    사진별제목본문[8] = {
+      제목: '모래는 왜 추방당했을까?',
+      본문: `모래가 놀이터에서 철거당한 가장 표면적인 이유는 ‘위생’과 ‘안전’이다. 어른들의 눈에 모래사장은 언제 길고양이가 똥을 싸고 갔을지 모르는 거대한 화장실이었고, 파상풍을 유발할 녹슨 못이나 깨진 유리병이 숨겨져 있는 지뢰밭이었다. 실제로 정기적으로 모래를 뒤집어주고 소독하지 않으면 오염의 위험이 있는 것은 사실이다. 결국 모래를 철거하는 행위는, 잠재적 위험을 관리하고 감수하기보다는 아예 그 싹을 잘라버리려는 극단적인 예방 조치였던 셈이다.
+
+하지만 그 이면에는 지극히 자본주의적이고 행정 편의주의적인 논리가 숨어 있다. 모래는 유지, 보수에 끊임없이 손이 간다. 비가 오면 유실되고, 바람이 불면 날아가며, 주기적으로 중금속 및 기생충 검사도 해야 한다. 반면 우레탄이나 고무 매트는 한 번 깔아두면 한동안 신경 쓸 일이 없다. 예산과 인력이 부족한 지자체나 아파트 관리사무소 입장에서는, 살아 숨 쉬며 끊임없이 변형되는 자연물인 모래보다 통제와 관리가 용이한 화학제품을 선택하는 것이 당연한 수순이었을 것이다.
+
+결국 모래의 철거는 우리가 겪고 있는 ‘비효율의 소거 과정’을 상징적으로 보여준다. 흙이 묻은 옷을 빨아야 하는 수고로움, 다칠지도 모른다는 불안감, 관리의 번거로움이라는 모든 '불편함'을 지워버린 결과다. 하지만 모래와 함께 아이들이 예측 불가능한 자연을 통제해 보며 느끼는 성취감과 창의성마저 포크레인에 실려 버려졌다. 흙먼지 날리는 무질서함 대신 매끈하고 안전한 통제를 선택한 우리 사회의 단면을, 텅 빈 우레탄 놀이터가 씁쓸하게 증명하고 있다.`
+    };
+
+
 
     // 전체 리셋 제스처 (두 손 모으기 2초 유지)
     let 리셋누적시간 = 0;
@@ -1190,13 +1460,34 @@
       기억사운드타이머들.forEach(clearTimeout);
       기억사운드타이머들 = [];
     }
+    function 시작화면초기화() {
+      const screen = document.getElementById('start-screen');
+      if (!screen) return;
+      let started = false;
+      function 시작(event) {
+        if (event && event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+        if (started) return;
+        started = true;
+        if (event && event.type === 'pointerdown') event.preventDefault();
+        screen.classList.add('is-hidden');
+        screen.setAttribute('aria-hidden', 'true');
+        오디오사용자활성화();
+        웹캠시작();
+        setTimeout(function () { screen.remove(); }, 500);
+      }
+      screen.addEventListener('pointerdown', 시작);
+      screen.addEventListener('click', 시작);
+      screen.addEventListener('keydown', 시작);
+      screen.focus({ preventScroll: true });
+    }
+
     window.addEventListener('load', function () {
       페이지사운드초기화();
+      시작화면초기화();
       Three장면초기화();
       마우스이벤트연결();
       키보드이벤트연결();
       드래그드롭이벤트연결();
-      웹캠시작();
       놀이터네비게이션초기화();
       사진리더초기화();
       requestAnimationFrame(애니메이션루프);
@@ -1293,10 +1584,22 @@
             sprite.userData.기본Y = y;
             sprite.userData.진동위상 = idx * 1.25 + Math.random();
 
-            // 사진 비율 크기 (가로 1.4, 세로 1.05)
-            sprite.scale.set(1.4, 1.05, 1.0);
-            sprite.userData.기본크기X = 1.4;
-            sprite.userData.기본크기Y = 1.05;
+            // 원본 비율을 유지하면서 기존 크기 상자(1.4 × 1.05) 안에 맞춥니다.
+            const textureImage = texture.image || {};
+            const imageRatio = textureImage.width && textureImage.height
+              ? textureImage.width / textureImage.height : (4 / 3);
+            const maxWidth = 1.4;
+            const maxHeight = 1.05;
+            let photoWidth = maxWidth;
+            let photoHeight = maxHeight;
+            if (imageRatio > maxWidth / maxHeight) {
+              photoHeight = maxWidth / imageRatio;
+            } else {
+              photoWidth = maxHeight * imageRatio;
+            }
+            sprite.scale.set(photoWidth, photoHeight, 1.0);
+            sprite.userData.기본크기X = photoWidth;
+            sprite.userData.기본크기Y = photoHeight;
 
             사진그룹.add(sprite);
             사진스프라이트들.push(sprite);
@@ -1366,7 +1669,7 @@
     /* ──────────────────────────────────────────────────────────────
        ★ 3종 모래놀이터 PLY 관리 및 미리보기 시스템
        1. sandplayground1 (sandplayground.ply) — 기존 모래놀이터기구
-       2. sandplayground2 (sandplayground2.ply) — 모래놀이터의 그네
+       2. sandplayground2 (sandplayground2.ply) — 모래장 그네
        3. sandplayground3 (sandplayground3.ply) — 모래놀이장
     ────────────────────────────────────────────────────────────── */
     const 놀이터목록 = [
@@ -1382,7 +1685,7 @@
         id: 'sandplayground2',
         파일명: 'sandplayground2_optimized.ply',
         대체파일명: null,
-        이름: '모래놀이터의 그네',
+        이름: '모래장 그네',
         부제목: 'sandplayground2',
         설명: '추억의 쇠사슬 그네'
       },
@@ -1400,8 +1703,14 @@
     let 썸네일생성여부 = [false, false, false];
     let 현재놀이터인덱스 = 0;
 
-    const PLY기본문구 = '씨알공원에 있는 모래놀이터이다. 정기소독을 거친 모래는 아이들이 창의적이게 노는 공간으로 남겨진다';
-    const PLY별텍스트내용 = [PLY기본문구, PLY기본문구, PLY기본문구];
+    const PLY별텍스트내용 = [
+      `
+공릉동 씨알공원 내에 있는 모래놀이터다. 우리가 어린 시절 동네 어귀에서 흔히 마주치고 뛰어놀던, 아주 전형적이고 친숙한 풍경을 품고 있는 놀이터의 모습이다. 푹신한 우레탄 바닥이 점령해 버린 요즘엔 좀처럼 보기 힘든 넓은 모래사장이 펼쳐져 있어, 한 걸음 내디딜 때마다 푹푹 파이는 발자국과 특유의 흙내음이 단숨에 향수를 불러일으킨다. 화려하거나 세련되진 않았지만, 언제든 달려가 털썩 주저앉아도 아무 조건 없이 품어줄 것만 같은 넉넉함과 온기가 남아있는 공간이다.`,
+      `
+삐그덕거리는 쇳소리에 맞춰 이곳 모래장에 놓인 그네를 세차게 구르다 보면, 허공을 가르는 발끝에서부터 부연 흙먼지가 흩날리며 춤을 춘다. 하늘에 닿을 듯한 속도감에 취해 있다가도, 때로는 그 얄미운 모래알이 바람을 타고 눈에 훅 들어와 찔끔 눈물을 흘리며 눈가를 비벼대야 했던 억울한 기억이 서려 있다. 신발 속으로 까끌까끌한 모래가 잔뜩 스며드는 줄도 모르고 발을 굴리던, 조금은 아프고 번거롭지만 결코 포기할 수 없었던 짜릿한 추억의 자리다.`,
+      `
+미끄러지고 오르기를 수없이 반복하다 보면 어느새 손바닥에 모래가 잔뜩 달라붙어 서걱서걱 씹히고 따끔거리지만, 그런 불편함쯤은 아랑곳하지 않고 연신 미끄럼틀로 향하게 만드는 묘한 몰입감이 있는 곳이다. 구석에 쪼그려 앉아 형형색색의 플라스틱 모래놀이 도구 몇 개만 쥐면, 축축한 모래를 꾹꾹 뭉치고 두드려 거대한 성벽이나 아지트를 세우는 훌륭한 공사장으로 변모한다. 정해진 규칙 없이 내 머릿속에 그린 상상을 무엇이든 뚝딱뚝딱 현실로 빚어낼 수 있었던, 가장 원초적이고 무한한 마법의 장소.`
+    ];
 
     function PLY텍스트칸선택(인덱스) {
       const editor = document.getElementById('ply-text-entry');
@@ -1673,9 +1982,18 @@
     function 사진리더초기화() {
       const reader = document.getElementById('photo-reader');
       const image = document.getElementById('photo-reader-image');
-      if (!reader || !image) return;
+      const title = document.getElementById('photo-reader-title');
+      const body = document.getElementById('photo-reader-body');
+      if (!reader || !image || !title || !body) return;
+      function savePhotoText() {
+        if (사진리더활성인덱스 < 0) return;
+        사진별제목본문[사진리더활성인덱스].제목 = title.value;
+        사진별제목본문[사진리더활성인덱스].본문 = body.value;
+      }
+      title.addEventListener('input', savePhotoText);
+      body.addEventListener('input', savePhotoText);
       reader.addEventListener('click', function (event) {
-        if (event.target === reader) 사진리더닫기();
+        if (!event.target.closest('.photo-reader-layout')) 사진리더닫기();
       });
       image.addEventListener('click', function (event) { event.stopPropagation(); });
       window.addEventListener('keydown', function (event) {
@@ -1688,8 +2006,21 @@
       if (!sprite || !sprite.userData.파일명) return;
       const reader = document.getElementById('photo-reader');
       const image = document.getElementById('photo-reader-image');
-      if (!reader || !image) return;
+      const title = document.getElementById('photo-reader-title');
+      const body = document.getElementById('photo-reader-body');
+      if (!reader || !image || !title || !body) return;
       사진리더스프라이트 = sprite;
+      사진리더활성인덱스 = 사진파일목록.indexOf(sprite.userData.파일명);
+      const hasCopy = 사진리더활성인덱스 >= 6 && 사진리더활성인덱스 <= 8;
+      reader.classList.toggle('has-copy', hasCopy);
+      if (hasCopy) {
+        const text = 사진별제목본문[사진리더활성인덱스];
+        title.value = text.제목;
+        body.value = text.본문;
+      } else {
+        title.value = '';
+        body.value = '';
+      }
       image.src = sprite.userData.파일명;
       reader.classList.add('is-open');
       reader.setAttribute('aria-hidden', 'false');
@@ -1699,11 +2030,12 @@
       const reader = document.getElementById('photo-reader');
       const image = document.getElementById('photo-reader-image');
       if (reader) {
-        reader.classList.remove('is-open');
+        reader.classList.remove('is-open', 'has-copy');
         reader.setAttribute('aria-hidden', 'true');
       }
       if (image) image.removeAttribute('src');
       사진리더스프라이트 = null;
+      사진리더활성인덱스 = -1;
     }
 
     function 기억사진선택(화면X, 화면Y) {
@@ -2108,6 +2440,10 @@
       if (handLink) handLink.classList.remove('is-scattered-hidden');
       const filmStrip = document.getElementById('left-film-strip');
       if (filmStrip) filmStrip.classList.remove('is-scattered-hidden');
+      const playgroundNav = document.getElementById('playground-nav');
+      if (playgroundNav) playgroundNav.classList.remove('is-scattered-hidden');
+      const spreadInstruction = document.getElementById('spread-instruction');
+      if (spreadInstruction) spreadInstruction.classList.remove('is-scattered-hidden');
       사진리더닫기();
       사진마우스호버 = null;
       사진손가락호버 = null;
@@ -2246,6 +2582,10 @@
                 if (handLink) handLink.classList.add('is-scattered-hidden');
                 const filmStrip = document.getElementById('left-film-strip');
                 if (filmStrip) filmStrip.classList.add('is-scattered-hidden');
+                const playgroundNav = document.getElementById('playground-nav');
+                if (playgroundNav) playgroundNav.classList.add('is-scattered-hidden');
+                const spreadInstruction = document.getElementById('spread-instruction');
+                if (spreadInstruction) spreadInstruction.classList.add('is-scattered-hidden');
                 목표흩어짐강도 = 3.0;
                 두손트리거락 = true;
               }
