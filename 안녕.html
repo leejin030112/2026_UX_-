@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>사르르 — 안녕, 마지막 인사</title>
+  <title>모래랑 친구와 이제 안녕</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       background: #0a0804;
@@ -20,10 +25,11 @@
       justify-content: center;
     }
 
-    /* ── 웹캠 — 사르르.html과 동일한 중앙 배치 ── */
+    
     #webcam-wrapper {
       position: fixed;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       z-index: 1;
       border: 1px solid rgba(200, 184, 154, 0.25);
@@ -33,12 +39,14 @@
       pointer-events: none;
       transition: opacity 1s ease;
     }
+
     #webcam {
       display: block;
-      transform: scaleX(-1); /* 거울 반전 */
+      transform: scaleX(-1);
+      
     }
 
-    /* ── 감성 비네트 오버레이 ── */
+    
     #vignette {
       position: fixed;
       inset: 0;
@@ -47,7 +55,7 @@
       background: radial-gradient(circle at center, transparent 30%, rgba(10, 8, 4, 0.85) 85%, #0a0804 100%);
     }
 
-    /* ── 무대 영역 (캐릭터가 걷고 인사하는 곳) ── */
+    
     #stage {
       position: fixed;
       inset: 0;
@@ -59,7 +67,7 @@
       pointer-events: none;
     }
 
-    /* 캐릭터 래퍼 */
+    
     #character-wrap {
       position: absolute;
       top: auto;
@@ -73,17 +81,17 @@
       transition: opacity 1.8s ease;
     }
 
-    /* 캐릭터 이미지 */
+    
     #character {
       width: min(26vw, 240px);
       height: min(24vh, 220px);
       object-fit: contain;
       transform-origin: bottom center;
       transition: transform 0.22s ease-out, filter 1.2s ease;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
     }
 
-    /* 캐릭터 말풍선 / 감정 텍스트 */
+    
     #bubble {
       margin-bottom: 16px;
       padding: 8px 18px;
@@ -100,14 +108,17 @@
       text-shadow: 0 0 10px rgba(255, 230, 180, 0.4);
       white-space: nowrap;
     }
-    #bubble { display: none !important; }
+
+    #bubble {
+      display: none !important;
+    }
 
     #bubble.show {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* ── P-1~P-4 격자형 엔딩 타일 ── */
+    
     #tile-cover {
       position: fixed;
       inset: 0;
@@ -120,7 +131,11 @@
       visibility: hidden;
       pointer-events: none;
     }
-    #tile-cover.active { visibility: visible; }
+
+    #tile-cover.active {
+      visibility: visible;
+    }
+
     .memory-tile {
       width: 100%;
       height: 100%;
@@ -128,12 +143,14 @@
       opacity: 0;
       transform: scale(0.72) rotate(var(--tile-rotation, 0deg));
       transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.75, 0.2, 1);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.45);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
     }
+
     .memory-tile.revealed {
       opacity: 1;
       transform: scale(1) rotate(var(--tile-rotation, 0deg));
     }
+
     #ending-objects {
       position: fixed;
       inset: 0;
@@ -141,6 +158,7 @@
       overflow: hidden;
       pointer-events: none;
     }
+
     .ending-object {
       position: absolute;
       display: block;
@@ -149,22 +167,26 @@
       opacity: 0;
       transform: translate(-50%, -50%) scale(var(--ending-scale, 1)) rotate(var(--ending-rotation, 0deg));
       transform-origin: center;
-      filter: blur(18px) drop-shadow(0 8px 16px rgba(0,0,0,0.45));
+      filter: blur(18px) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
       will-change: opacity, filter;
     }
+
     .ending-object.visible {
       animation: ending-object-appear 1s ease-in-out both;
     }
+
     @keyframes ending-object-appear {
       from {
         opacity: 0;
-        filter: blur(18px) drop-shadow(0 8px 16px rgba(0,0,0,0.45));
+        filter: blur(18px) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
       }
+
       to {
         opacity: 1;
-        filter: blur(0) drop-shadow(0 8px 16px rgba(0,0,0,0.45));
+        filter: blur(0) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
       }
     }
+
     #ending-blur {
       position: fixed;
       inset: 0;
@@ -175,33 +197,50 @@
       backdrop-filter: blur(0) brightness(1);
       transition: opacity 1.8s ease, backdrop-filter 1.8s ease, background-color 1.8s ease;
     }
+
     #ending-blur.active {
       opacity: 1;
       background: rgba(10, 8, 4, 0.24);
       backdrop-filter: blur(12px) brightness(0.65);
     }
-    .tile-cover-active #webcam-wrapper { z-index: 26; }
 
-    /* ── 상단 / 하단 안내 UI ── */
+    .tile-cover-active #webcam-wrapper {
+      z-index: 26;
+    }
+
+    
     #hand-status {
-      position: fixed; top: 16px; left: 20px;
+      position: fixed;
+      top: 16px;
+      left: 20px;
       z-index: 10;
-      display: flex; align-items: center; gap: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 0.75rem;
-      color: rgba(200, 184, 154, 0.85);
+      color: rgba(255, 255, 255, 0.85);
       background: rgba(10, 8, 4, 0.65);
       padding: 6px 14px;
       border-radius: 0;
-      border: 1px solid rgba(200, 184, 154, 0.2);
+      border: 1px solid rgb(255, 255, 255);
     }
+
     #hand-dot {
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
       border-radius: 0;
       background: #666;
       transition: background 0.25s, box-shadow 0.25s;
     }
-    #hand-dot.wave { background: #ffe6b4; box-shadow: 0 0 10px #ffe6b4; }
-    #hand-dot.ready { background: #5a8a5a; }
+
+    #hand-dot.wave {
+      background: #ffffff;
+      box-shadow: 0 0 10px #ffffff;
+    }
+
+    #hand-dot.ready {
+      background: #5a8a5a;
+    }
 
     #guide-text {
       position: fixed;
@@ -209,27 +248,30 @@
       z-index: 10;
       text-align: center;
       font-size: 0.88rem;
-      color: rgba(200, 184, 154, 0.7);
+      color: rgb(255, 255, 255);
       letter-spacing: 0.06em;
       line-height: 1.6;
       transition: opacity 0.8s ease;
     }
+
     #guide-text strong {
-      color: #ffe6b4;
+      color: #ffffff;
     }
 
-    /* 마우스 흔들기 커서 손 */
+    
     #custom-cursor {
       position: fixed;
       z-index: 20;
-      width: 70px; height: 70px;
-      margin-left: -35px; margin-top: -35px;
+      width: 70px;
+      height: 70px;
+      margin-left: -35px;
+      margin-top: -35px;
       pointer-events: none;
       display: none;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
     }
 
-    /* ── 마지막 엔딩 장면 (암전 & 문장) ── */
+    
     #ending-screen {
       position: fixed;
       inset: 0;
@@ -244,15 +286,17 @@
       pointer-events: none;
       transition: opacity 2.5s ease;
     }
+
     #ending-screen.active {
       opacity: 1;
       pointer-events: auto;
     }
+
     #ending-quote {
       font-size: clamp(1.1rem, 2.8vw, 1.7rem);
       line-height: 1.8;
       text-align: center;
-      color: #e8dcc8;
+      color: #ffffff;
       letter-spacing: 0.08em;
       font-weight: 300;
       max-width: 680px;
@@ -262,24 +306,28 @@
       transform: translateY(15px);
       transition: opacity 1.8s ease 0.6s, transform 1.8s ease 0.6s;
     }
+
     #ending-screen.active #ending-quote {
       opacity: 1;
       transform: translateY(0);
     }
+
     .ending-btns {
       display: flex;
       gap: 16px;
       opacity: 0;
       transition: opacity 1.5s ease 1.8s;
     }
+
     #ending-screen.active .ending-btns {
       opacity: 1;
     }
+
     .nav-btn {
       padding: 11px 26px;
-      border: 1px solid rgba(200, 184, 154, 0.4);
+      border: 1px solid rgb(255, 255, 255);
       background: rgba(200, 184, 154, 0.08);
-      color: #c8b89a;
+      color: #ffffff;
       border-radius: 0;
       font-size: 0.85rem;
       cursor: pointer;
@@ -287,6 +335,7 @@
       letter-spacing: 0.05em;
       transition: all 0.3s ease;
     }
+
     .nav-btn:hover {
       background: rgba(200, 184, 154, 0.25);
       color: #fff;
@@ -294,37 +343,28 @@
       transform: translateY(-2px);
     }
 
-    /* 상단 놀이터로 가기 버튼 */
+    
     #back-to-playground {
       position: fixed;
-      top: 16px; right: 20px;
+      top: 16px;
+      right: 20px;
       z-index: 10;
       padding: 6px 14px;
       font-size: 0.75rem;
-      color: rgba(200, 184, 154, 0.7);
+      color: rgb(255, 255, 255);
       background: rgba(10, 8, 4, 0.65);
-      border: 1px solid rgba(200, 184, 154, 0.2);
+      border: 1px solid rgb(255, 255, 255);
       border-radius: 0;
       text-decoration: none;
       transition: all 0.2s;
     }
-    #ending-editor-link {
-      position: fixed;
-      top: 16px;
-      right: 188px;
-      z-index: 10;
-      padding: 6px 14px;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.85);
-      background: rgba(10,8,4,0.65);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 0;
-      text-decoration: none;
-    }
+
+
     #back-to-playground:hover {
-      color: #ffe6b4;
-      border-color: rgba(200, 184, 154, 0.6);
+      color: #ffffff;
+      border-color: rgb(255, 255, 255);
     }
+
     #music-toggle {
       position: fixed;
       top: 56px;
@@ -336,753 +376,727 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(255,255,255,0.9);
-      background: rgba(10,8,4,0.72);
-      border: 1px solid rgba(255,255,255,0.24);
-      border-radius: 50%;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(10, 8, 4, 0.72);
+      border: 1px solid rgb(255, 255, 255) border-radius: 50%;
       font: inherit;
       font-size: 20px;
       letter-spacing: 0.02em;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
+
     #music-toggle:hover {
-      border-color: rgba(255,255,255,0.58);
+      border-color: rgba(255, 255, 255, 0.58);
       color: #fff;
     }
   </style>
 </head>
+
 <body>
 
-<!-- 웹캠 배경 -->
-<div id="webcam-wrapper">
-  <video id="webcam" autoplay muted playsinline></video>
-</div>
-
-<!-- 비네트 -->
-<div id="vignette"></div>
-
-<!-- 마우스 손 커서 -->
-<img id="custom-cursor" src="손1.png" alt="손">
-
-<!-- 상단 상태 -->
-<div id="hand-status">
-  <div id="hand-dot"></div>
-  <span id="hand-label">손 감지 준비 중…</span>
-</div>
-
-<a href="사르르.html" id="back-to-playground">← 흙놀이터로 돌아가기</a>
-<button id="music-toggle" type="button" aria-label="음악 끄기" aria-pressed="true">♫</button>
-<a href="엔딩편집.html" id="ending-editor-link">엔딩 장면 편집 미리보기</a>
-
-<!-- 무대: 걸어가는 캐릭터 -->
-<div id="stage">
-  <div id="character-wrap">
-    <div id="bubble">안녕... 또 만나!</div>
-    <img id="character" src="주인공뒷모습.png" alt="캐릭터">
+  
+  <div id="webcam-wrapper">
+    <video id="webcam" autoplay muted playsinline></video>
   </div>
-</div>
 
-<div id="guide-text">
-  웹캠을 향해 <strong>손을 흔들면(👋 인사)</strong> 멈춰서서 나에게 인사합니다.<br>
-  <span style="font-size:0.82em;opacity:0.75">손을 멈추면 다시 뒤돌아 걸어가고, 가만히 두면 저 멀리 사라집니다.</span>
-</div>
+  
+  <div id="vignette"></div>
 
-<!-- P-1~P-4 기억 타일 격자 -->
-<div id="tile-cover" aria-hidden="true" data-started="false"></div>
+  
+  <img id="custom-cursor" src="손1.png" alt="손">
 
-<!-- 마지막 장면 이미지 레이어 -->
-<div id="ending-objects" aria-hidden="true"></div>
-<div id="ending-blur" aria-hidden="true"></div>
-
-<!-- 엔딩 화면 -->
-<div id="ending-screen">
-  <p id="ending-quote">
-    우리의 안녕과 모래는<br>
-    포장타일 밑에 존재한다
-  </p>
-  <div class="ending-btns">
-    <button class="nav-btn" onclick="다시시작()">처음부터 다시 보기</button>
-    <a href="사르르.html" class="nav-btn">흙놀이터(사르르) 가기</a>
+  
+  <div id="hand-status">
+    <div id="hand-dot"></div>
+    <span id="hand-label">손 감지 준비 중…</span>
   </div>
-</div>
 
-<script>
-"use strict";
+  <a href="사르르.html" id="back-to-playground">← 모래놀이터로 돌아가기</a>
+  <button id="music-toggle" type="button" aria-label="음악 끄기" aria-pressed="true">♫</button>
 
-/* ══════════════════════════════════════════════════════════════
-   프레임 이미지 에셋
-══════════════════════════════════════════════════════════════ */
-const 걷기프레임   = ["뒷걸음1.png", "뒷걸음2.png"];
-const 인사프레임   = ["인사1.png", "인사2.png", "인사3.png", "인사2.png", "인사1.png"];
-const 손커서프레임 = ["손1.png", "손2.png", "손3.png", "손4.png", "손3.png", "손2.png"];
+  
+  <div id="stage">
+    <div id="character-wrap">
+      <div id="bubble">안녕... 또 만나!</div>
+      <img id="character" src="주인공뒷모습.png" alt="캐릭터">
+    </div>
+  </div>
 
-/* ══════════════════════════════════════════════════════════════
-   상태 변수
-══════════════════════════════════════════════════════════════ */
-let 상태 = "walk"; // "walk" <-> "greet"  ===>  "fading" -> "ended"
-let 현재스케일 = 1.0;
-let 걷기인덱스 = 0;
-let 인사인덱스 = 0;
-let 커서인덱스 = 0;
+  <div id="guide-text">
+    웹캠을 향해 <strong>손을 흔들면(👋)</strong> 친구가 멈춰서서 나에게 인사합니다.<br>
+    <span style="font-size:0.82em;opacity:0.75">손을 멈추면 다시 뒤돌아 걸어가고, 가만히 두면 저 멀리 사라집니다.</span>
+  </div>
 
-let 걷기타이머 = null;
-let 인사타이머 = null;
-let 커서타이머 = null;
-let tileGenerationTimer = null;
-let endingSequenceTimers = [];
+  
+  <div id="tile-cover" aria-hidden="true" data-started="false"></div>
 
-// MediaPipe & 흔들기 추적
-let handLandmarker = null;
-let 손X이력 = [];
-let 마지막손흔듦시각 = 0; // 마지막으로 손 흔듦이 감지된 시간 (밀리초)
+  
+  <div id="ending-objects" aria-hidden="true"></div>
+  <div id="ending-blur" aria-hidden="true"></div>
 
-// 웹캠 설정
-const 웹캠크기비율 = 0.22;
-const 웹캠투명도   = 0.65;
+  
+  <div id="ending-screen">
+    <p id="ending-quote">
+      우리의 안녕과 모래는<br>
+      우레탄 밑에 존재한다
+    </p>
+    <div class="ending-btns">
+      <button class="nav-btn" onclick="다시시작()">다시 인사하기</button>
+      <a href="사르르.html" class="nav-btn">모래놀이터로 돌아가기</a>
+    </div>
+  </div>
 
-const charEl      = document.getElementById('character');
-const charWrap    = document.getElementById('character-wrap');
-const bubbleEl    = document.getElementById('bubble');
-const handDot     = document.getElementById('hand-dot');
-const handLabel   = document.getElementById('hand-label');
-const guideText   = document.getElementById('guide-text');
-const endingScreen= document.getElementById('ending-screen');
-const tileCover   = document.getElementById('tile-cover');
-const 타일사진목록 = ["p1.jpg", "p2.jpg", "p3.jpg", "p4.jpg"];
-const endingObjectsEl = document.getElementById('ending-objects');
-const endingBlurEl = document.getElementById('ending-blur');
-const 엔딩이미지배치 = {
-  "playground": [
-    {
-      "src": "p1.png",
-      "x": 17.137930256538773,
-      "y": 26.371863388433695,
-      "widthVw": 34,
-      "scale": 1.85,
-      "jitterX": 3,
-      "jitterY": 3
-    },
-    {
-      "src": "p2.png",
-      "x": 97.38161737488046,
-      "y": 47.732754817570274,
-      "widthVw": 36,
-      "scale": 1.35,
-      "jitterX": 3,
-      "jitterY": 3
-    },
-    {
-      "src": "p3.png",
-      "x": 21.210903587588287,
-      "y": 96.24461156009743,
-      "widthVw": 25,
-      "scale": 1.5,
-      "jitterX": 2,
-      "jitterY": 4
-    }
-  ],
-  "people": [
-    {
-      "src": "people1.png",
-      "x": 78.7680952892786,
-      "y": 77.69741203170565,
-      "widthVw": 13.5,
-      "scale": 1.05,
-      "jitterX": 4,
-      "jitterY": 3
-    },
-    {
-      "src": "people2.png",
-      "x": 24.291737844412154,
-      "y": 44.00601134800834,
-      "widthVw": 14,
-      "scale": 1.35,
-      "jitterX": 3,
-      "jitterY": 3
-    },
-    {
-      "src": "people3.png",
-      "x": 57.163829639562806,
-      "y": 13.792152704135741,
-      "widthVw": 17.5,
-      "scale": 0.7,
-      "jitterX": 3,
-      "jitterY": 4
-    },
-    {
-      "src": "people4.png",
-      "x": 72.96174938612788,
-      "y": 13.374333985410594,
-      "widthVw": 29,
-      "scale": 1,
-      "jitterX": 4,
-      "jitterY": 3
-    }
-  ]
-};
-const customCursor= document.getElementById('custom-cursor');
+  <script>
+    "use strict";
 
-/* ══════════════════════════════════════════════════════════════
-   진입점
-══════════════════════════════════════════════════════════════ */
-let 페이지배경음 = null;
-let 효과음파일 = {};
-let 재생중효과음 = new Set();
-let 음악켜짐 = true;
-let 환경사운드시작됨 = false;
+    
+    const 걷기프레임 = ["뒷걸음1.png", "뒷걸음2.png"];
+    const 인사프레임 = ["인사1.png", "인사2.png", "인사3.png", "인사2.png", "인사1.png"];
+    const 손커서프레임 = ["손1.png", "손2.png", "손3.png", "손4.png", "손3.png", "손2.png"];
 
-function 페이지사운드초기화() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('audioOn')) 음악켜짐 = params.get('audioOn') !== '0';
-  const 재개초 = Number(params.get('audioTime'));
+    
+    let 상태 = "walk"; // "walk" <-> "greet"  ===>  "fading" -> "ended"
+    let 현재스케일 = 1.0;
+    let 걷기인덱스 = 0;
+    let 인사인덱스 = 0;
+    let 커서인덱스 = 0;
 
-  페이지배경음 = new Audio('backgroundsong.mp3');
-  페이지배경음.loop = true;
-  페이지배경음.volume = 0.38;
-  페이지배경음.preload = 'auto';
-  if (Number.isFinite(재개초) && 재개초 > 0) {
-    const 재개위치설정 = function () {
-      if (페이지배경음.duration > 0) 페이지배경음.currentTime = 재개초 % 페이지배경음.duration;
-      else 페이지배경음.currentTime = 재개초;
+    let 걷기타이머 = null;
+    let 인사타이머 = null;
+    let 커서타이머 = null;
+    let tileGenerationTimer = null;
+    let endingSequenceTimers = [];
+
+    // MediaPipe & 흔들기 추적
+    let handLandmarker = null;
+    let 손X이력 = [];
+    let 마지막손흔듦시각 = 0; // 마지막으로 손 흔듦이 감지된 시간 (밀리초)
+
+    // 웹캠 설정
+    const 웹캠크기비율 = 0.22;
+    const 웹캠투명도 = 0.65;
+
+    const charEl = document.getElementById('character');
+    const charWrap = document.getElementById('character-wrap');
+    const bubbleEl = document.getElementById('bubble');
+    const handDot = document.getElementById('hand-dot');
+    const handLabel = document.getElementById('hand-label');
+    const guideText = document.getElementById('guide-text');
+    const endingScreen = document.getElementById('ending-screen');
+    const tileCover = document.getElementById('tile-cover');
+    const 타일사진목록 = ["p1.jpg", "p2.jpg", "p3.jpg", "p4.jpg"];
+    const endingObjectsEl = document.getElementById('ending-objects');
+    const endingBlurEl = document.getElementById('ending-blur');
+    const 엔딩이미지배치 = {
+      "playground": [
+        {
+          "src": "p1.png",
+          "x": 17.137930256538773,
+          "y": 26.371863388433695,
+          "widthVw": 34,
+          "scale": 1.85,
+          "jitterX": 3,
+          "jitterY": 3
+        },
+        {
+          "src": "p2.png",
+          "x": 97.38161737488046,
+          "y": 47.732754817570274,
+          "widthVw": 36,
+          "scale": 1.35,
+          "jitterX": 3,
+          "jitterY": 3
+        },
+        {
+          "src": "p3.png",
+          "x": 21.210903587588287,
+          "y": 96.24461156009743,
+          "widthVw": 25,
+          "scale": 1.5,
+          "jitterX": 2,
+          "jitterY": 4
+        }
+      ],
+      "people": [
+        {
+          "src": "people1.png",
+          "x": 78.7680952892786,
+          "y": 77.69741203170565,
+          "widthVw": 13.5,
+          "scale": 1.05,
+          "jitterX": 4,
+          "jitterY": 3
+        },
+        {
+          "src": "people2.png",
+          "x": 24.291737844412154,
+          "y": 44.00601134800834,
+          "widthVw": 14,
+          "scale": 1.35,
+          "jitterX": 3,
+          "jitterY": 3
+        },
+        {
+          "src": "people3.png",
+          "x": 57.163829639562806,
+          "y": 13.792152704135741,
+          "widthVw": 17.5,
+          "scale": 0.7,
+          "jitterX": 3,
+          "jitterY": 4
+        },
+        {
+          "src": "people4.png",
+          "x": 72.96174938612788,
+          "y": 13.374333985410594,
+          "widthVw": 29,
+          "scale": 1,
+          "jitterX": 4,
+          "jitterY": 3
+        }
+      ]
     };
-    페이지배경음.addEventListener('loadedmetadata', 재개위치설정, { once: true });
-    if (페이지배경음.readyState >= 1) 재개위치설정();
-  }
+    const customCursor = document.getElementById('custom-cursor');
 
-  ['btn', 'mbk', 'bird', 'mend2-1', 'mend2-2', 'mend2-3'].forEach(function (이름) {
-    효과음파일[이름] = new Audio(이름 + '.mp3');
-    효과음파일[이름].preload = 'auto';
-  });
+    
+    let 페이지배경음 = null;
+    let 효과음파일 = {};
+    let 재생중효과음 = new Set();
+    let 음악켜짐 = true;
+    let 환경사운드시작됨 = false;
 
-  const 음악버튼 = document.getElementById('music-toggle');
-  if (음악버튼) {
-    음악버튼.addEventListener('click', function () {
-      음악켜짐 = !음악켜짐;
-      음악버튼화면갱신();
-      if (음악켜짐) 오디오사용자활성화();
-      else 오디오모두정지();
-    });
-    음악버튼화면갱신();
-  }
+    function 페이지사운드초기화() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('audioOn')) 음악켜짐 = params.get('audioOn') !== '0';
+      const 재개초 = Number(params.get('audioTime'));
 
-  const 돌아가기링크 = document.getElementById('back-to-playground');
-  if (돌아가기링크) {
-    돌아가기링크.addEventListener('click', function (event) {
-      event.preventDefault();
-      window.location.href = 오디오상태포함주소(돌아가기링크.href);
-    });
-  }
+      페이지배경음 = new Audio('backgroundsong.mp3');
+      페이지배경음.loop = true;
+      페이지배경음.volume = 0.38;
+      페이지배경음.preload = 'auto';
+      if (Number.isFinite(재개초) && 재개초 > 0) {
+        const 재개위치설정 = function () {
+          if (페이지배경음.duration > 0) 페이지배경음.currentTime = 재개초 % 페이지배경음.duration;
+          else 페이지배경음.currentTime = 재개초;
+        };
+        페이지배경음.addEventListener('loadedmetadata', 재개위치설정, { once: true });
+        if (페이지배경음.readyState >= 1) 재개위치설정();
+      }
 
-  document.addEventListener('pointerdown', 오디오사용자활성화, { passive: true });
-  document.addEventListener('keydown', 오디오사용자활성화);
-  document.addEventListener('click', function (event) {
-    오디오사용자활성화();
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    if (!target.closest('#music-toggle') && target.closest('button, a, [role="button"]')) {
-      오디오효과재생('btn', 0.62);
+      ['btn', 'mbk', 'bird', 'mend2-1', 'mend2-2', 'mend2-3'].forEach(function (이름) {
+        효과음파일[이름] = new Audio(이름 + '.mp3');
+        효과음파일[이름].preload = 'auto';
+      });
+
+      const 음악버튼 = document.getElementById('music-toggle');
+      if (음악버튼) {
+        음악버튼.addEventListener('click', function () {
+          음악켜짐 = !음악켜짐;
+          음악버튼화면갱신();
+          if (음악켜짐) 오디오사용자활성화();
+          else 오디오모두정지();
+        });
+        음악버튼화면갱신();
+      }
+
+      const 돌아가기링크 = document.getElementById('back-to-playground');
+      if (돌아가기링크) {
+        돌아가기링크.addEventListener('click', function (event) {
+          event.preventDefault();
+          window.location.href = 오디오상태포함주소(돌아가기링크.href);
+        });
+      }
+
+      document.addEventListener('pointerdown', 오디오사용자활성화, { passive: true });
+      document.addEventListener('keydown', 오디오사용자활성화);
+      document.addEventListener('click', function (event) {
+        오디오사용자활성화();
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        if (!target.closest('#music-toggle') && target.closest('button, a, [role="button"]')) {
+          오디오효과재생('btn', 0.62);
+        }
+      }, true);
+
+      if (params.get('resumeAudio') === '1' && 음악켜짐) 오디오사용자활성화();
     }
-  }, true);
 
-  if (params.get('resumeAudio') === '1' && 음악켜짐) 오디오사용자활성화();
-}
-
-function 음악버튼화면갱신() {
-  const button = document.getElementById('music-toggle');
-  if (!button) return;
-  button.textContent = 음악켜짐 ? '♫' : '♫̸';
-  button.setAttribute('aria-pressed', 음악켜짐 ? 'true' : 'false');
-  button.setAttribute('aria-label', 음악켜짐 ? '음악 끄기' : '음악 켜기');
-}
-
-function 오디오상태포함주소(targetUrl) {
-  const url = new URL(targetUrl, window.location.href);
-  url.searchParams.set('audioOn', 음악켜짐 ? '1' : '0');
-  url.searchParams.set('audioTime', 페이지배경음 ? String(페이지배경음.currentTime || 0) : '0');
-  url.searchParams.set('resumeAudio', '1');
-  return url.href;
-}
-
-function 오디오모두정지() {
-  if (페이지배경음) 페이지배경음.pause();
-  재생중효과음.forEach(function (sound) {
-    sound.pause();
-    sound.currentTime = 0;
-  });
-  재생중효과음.clear();
-}
-
-function 오디오사용자활성화() {
-  if (!음악켜짐) return;
-  if (페이지배경음 && 페이지배경음.paused) {
-    페이지배경음.play().catch(function () {});
-  }
-  if (환경사운드시작됨) return;
-  환경사운드시작됨 = true;
-  환경사운드예약('mbk', 12000, 31000, 0.34);
-  환경사운드예약('bird', 20000, 47000, 0.4);
-}
-
-function 환경사운드예약(이름, 최소간격, 최대간격, 볼륨) {
-  setTimeout(function () {
-    오디오효과재생(이름, 볼륨);
-    환경사운드예약(이름, 최소간격, 최대간격, 볼륨);
-  }, 최소간격 + Math.random() * (최대간격 - 최소간격));
-}
-
-function 오디오효과재생(이름, 볼륨) {
-  if (!음악켜짐) return;
-  const 원본 = 효과음파일[이름];
-  if (!원본) return;
-  const 효과음 = 원본.cloneNode();
-  효과음.volume = 볼륨 === undefined ? 0.7 : 볼륨;
-  효과음.currentTime = 0;
-  재생중효과음.add(효과음);
-  효과음.addEventListener('ended', function () { 재생중효과음.delete(효과음); }, { once: true });
-  효과음.play().catch(function () { 재생중효과음.delete(효과음); });
-}
-window.addEventListener('load', function() {
-  페이지사운드초기화();
-  웹캠시작();
-  마우스이벤트연결();
-  걷기시작();
-  requestAnimationFrame(상태감시루프);
-});
-
-/* ──────────────────────────────────────────────────────────────
-   1. 걷기 모드: 뒤돌아서서 천천히 멀어져 감
-────────────────────────────────────────────────────────────── */
-function 걷기시작() {
-  상태 = "walk";
-  bubbleEl.classList.remove('show');
-  handDot.className = 'ready';
-  handLabel.innerText = '친구가 멀어지는 중… (손을 흔들어보세요 👋)';
-
-  if (인사타이머) { clearInterval(인사타이머); 인사타이머 = null; }
-  if (걷기타이머) clearInterval(걷기타이머);
-
-  걷기타이머 = setInterval(function() {
-    if (상태 !== "walk") return;
-
-    // 발걸음 교차 (뒷모습)
-    걷기인덱스++;
-    charEl.src = 걷기프레임[걷기인덱스 % 걷기프레임.length];
-
-    // 가만히 멈추면 계속 걸어가다가 점점 작아짐
-    현재스케일 = Math.max(0.06, 현재스케일 - (0.94 / 32));
-    charEl.style.transform = `scale(${현재스케일})`;
-
-    // 저 멀리 지평선 너머로 아주 작아지면 사라짐!
-    if (현재스케일 <= 0.08 && 상태 === "walk") {
-      사라지기시작();
+    function 음악버튼화면갱신() {
+      const button = document.getElementById('music-toggle');
+      if (!button) return;
+      button.textContent = 음악켜짐 ? '♫' : '♫̸';
+      button.setAttribute('aria-pressed', 음악켜짐 ? 'true' : 'false');
+      button.setAttribute('aria-label', 음악켜짐 ? '음악 끄기' : '음악 켜기');
     }
-  }, 250);
-}
 
-/* ──────────────────────────────────────────────────────────────
-   2. 인사 모드: 그 자리에서 멈춰 서서 나를 향해 손을 흔듦
-────────────────────────────────────────────────────────────── */
-function 인사하기시작() {
-  if (상태 === "greet" || 상태 === "fading" || 상태 === "ended") return;
-  상태 = "greet";
-  const 돌아보기소리 = ['mend2-1', 'mend2-2', 'mend2-3'][Math.floor(Math.random() * 3)];
-  오디오효과재생(돌아보기소리, 0.7);
+    function 오디오상태포함주소(targetUrl) {
+      const url = new URL(targetUrl, window.location.href);
+      url.searchParams.set('audioOn', 음악켜짐 ? '1' : '0');
+      url.searchParams.set('audioTime', 페이지배경음 ? String(페이지배경음.currentTime || 0) : '0');
+      url.searchParams.set('resumeAudio', '1');
+      return url.href;
+    }
 
-  // 걷기 멈춤 (현재 스케일 위치 그대로 고정!)
-  if (걷기타이머) { clearInterval(걷기타이머); 걷기타이머 = null; }
+    function 오디오모두정지() {
+      if (페이지배경음) 페이지배경음.pause();
+      재생중효과음.forEach(function (sound) {
+        sound.pause();
+        sound.currentTime = 0;
+      });
+      재생중효과음.clear();
+    }
 
-  // 뒤돌아서서 나를 향해 손흔들기
-  인사인덱스 = 0;
-  charEl.src = 인사프레임[0];
+    function 오디오사용자활성화() {
+      if (!음악켜짐) return;
+      if (페이지배경음 && 페이지배경음.paused) {
+        페이지배경음.play().catch(function () { });
+      }
+      if (환경사운드시작됨) return;
+      환경사운드시작됨 = true;
+      환경사운드예약('mbk', 12000, 31000, 0.34);
+      환경사운드예약('bird', 20000, 47000, 0.4);
+    }
 
-  bubbleEl.innerText = 현재스케일 < 0.4 ? "잘 가... 잊지 않을게!" : "안녕... 또 만나!";
-  bubbleEl.classList.add('show');
+    function 환경사운드예약(이름, 최소간격, 최대간격, 볼륨) {
+      setTimeout(function () {
+        오디오효과재생(이름, 볼륨);
+        환경사운드예약(이름, 최소간격, 최대간격, 볼륨);
+      }, 최소간격 + Math.random() * (최대간격 - 최소간격));
+    }
 
-  handDot.className = 'wave';
-  handLabel.innerText = '👋 친구가 멈춰 서서 인사합니다';
+    function 오디오효과재생(이름, 볼륨) {
+      if (!음악켜짐) return;
+      const 원본 = 효과음파일[이름];
+      if (!원본) return;
+      const 효과음 = 원본.cloneNode();
+      효과음.volume = 볼륨 === undefined ? 0.7 : 볼륨;
+      효과음.currentTime = 0;
+      재생중효과음.add(효과음);
+      효과음.addEventListener('ended', function () { 재생중효과음.delete(효과음); }, { once: true });
+      효과음.play().catch(function () { 재생중효과음.delete(효과음); });
+    }
+    window.addEventListener('load', function () {
+      페이지사운드초기화();
+      웹캠시작();
+      마우스이벤트연결();
+      걷기시작();
+      requestAnimationFrame(상태감시루프);
+    });
 
-  if (인사타이머) clearInterval(인사타이머);
-  인사타이머 = setInterval(function() {
-    if (상태 !== "greet") return;
-    인사인덱스 = (인사인덱스 + 1) % 인사프레임.length;
-    charEl.src = 인사프레임[인사인덱스];
-  }, 140);
-}
+    
+    function 걷기시작() {
+      상태 = "walk";
+      bubbleEl.classList.remove('show');
+      handDot.className = 'ready';
+      handLabel.innerText = '친구가 멀어지는 중… (손을 흔들어보세요 👋)';
 
-/* ──────────────────────────────────────────────────────────────
-   3. 상태 감시 루프:
-   - 인사를 하다가 손 흔들기를 멈추면(1.2초 경과) -> 다시 뒤돌아 걸어감!
-────────────────────────────────────────────────────────────── */
-function 상태감시루프() {
-  requestAnimationFrame(상태감시루프);
+      if (인사타이머) { clearInterval(인사타이머); 인사타이머 = null; }
+      if (걷기타이머) clearInterval(걷기타이머);
 
-  let now = performance.now();
+      걷기타이머 = setInterval(function () {
+        if (상태 !== "walk") return;
 
-  // 현재 인사 중인데, 손 흔듦이 멈춘 지 1.2초 이상 지났으면 -> 다시 걷기 재개!
-  if (상태 === "greet") {
-    if (now - 마지막손흔듦시각 > 1200) {
+        // 발걸음 교차 (뒷모습)
+        걷기인덱스++;
+        charEl.src = 걷기프레임[걷기인덱스 % 걷기프레임.length];
+
+        // 가만히 멈추면 계속 걸어가다가 점점 작아짐
+        현재스케일 = Math.max(0.06, 현재스케일 - (0.94 / 32));
+        charEl.style.transform = `scale(${현재스케일})`;
+
+        // 저 멀리 지평선 너머로 아주 작아지면 사라짐!
+        if (현재스케일 <= 0.08 && 상태 === "walk") {
+          사라지기시작();
+        }
+      }, 250);
+    }
+
+    
+    function 인사하기시작() {
+      if (상태 === "greet" || 상태 === "fading" || 상태 === "ended") return;
+      상태 = "greet";
+      const 돌아보기소리 = ['mend2-1', 'mend2-2', 'mend2-3'][Math.floor(Math.random() * 3)];
+      오디오효과재생(돌아보기소리, 0.7);
+
+      // 걷기 멈춤 (현재 스케일 위치 그대로 고정!)
+      if (걷기타이머) { clearInterval(걷기타이머); 걷기타이머 = null; }
+
+      // 뒤돌아서서 나를 향해 손흔들기
+      인사인덱스 = 0;
+      charEl.src = 인사프레임[0];
+
+      bubbleEl.innerText = 현재스케일 < 0.4 ? "잘 가... 잊지 않을게!" : "안녕... 또 만나!";
+      bubbleEl.classList.add('show');
+
+      handDot.className = 'wave';
+      handLabel.innerText = '👋 친구가 멈춰 서서 인사합니다';
+
+      if (인사타이머) clearInterval(인사타이머);
+      인사타이머 = setInterval(function () {
+        if (상태 !== "greet") return;
+        인사인덱스 = (인사인덱스 + 1) % 인사프레임.length;
+        charEl.src = 인사프레임[인사인덱스];
+      }, 140);
+    }
+
+    
+    function 상태감시루프() {
+      requestAnimationFrame(상태감시루프);
+
+      let now = performance.now();
+
+      // 현재 인사 중인데, 손 흔듦이 멈춘 지 1.2초 이상 지났으면 -> 다시 걷기 재개!
+      if (상태 === "greet") {
+        if (now - 마지막손흔듦시각 > 1200) {
+          걷기시작();
+        }
+      }
+    }
+
+    
+    function 타일덮기시작() {
+      if (tileCover.dataset.started === 'true') return;
+      tileCover.dataset.started = 'true';
+      tileCover.innerHTML = '';
+      if (tileGenerationTimer) clearTimeout(tileGenerationTimer);
+
+      const 한칸크기 = Math.max(88, Math.min(150, Math.round(window.innerWidth / 11)));
+      const 간격 = 6;
+      const 열수 = Math.ceil(window.innerWidth / 한칸크기);
+      const 행수 = Math.ceil(window.innerHeight / 한칸크기);
+      const 칸너비 = (window.innerWidth - 간격 * (열수 - 1)) / 열수;
+      const 칸높이 = (window.innerHeight - 간격 * (행수 - 1)) / 행수;
+      const webcam = document.getElementById('webcam-wrapper');
+      const video = document.getElementById('webcam');
+      const visibleCamera = webcam.getBoundingClientRect();
+      const cameraWidth = window.innerWidth * 0.22;
+      const cameraAspect = video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 4 / 3;
+      const cameraLeft = visibleCamera.width > 0 ? visibleCamera.left : (window.innerWidth - cameraWidth) / 2;
+      const cameraTop = visibleCamera.height > 0 ? visibleCamera.top : (window.innerHeight - cameraWidth / cameraAspect) / 2;
+      const cameraRight = visibleCamera.width > 0 ? visibleCamera.right : cameraLeft + cameraWidth;
+      const cameraBottom = visibleCamera.height > 0 ? visibleCamera.bottom : cameraTop + cameraWidth / cameraAspect;
+      const cameraClearance = 6;
+      const 칸목록 = [];
+      tileCover.style.setProperty('--tile-cols', 열수);
+      tileCover.style.setProperty('--tile-rows', 행수);
+
+      for (let row = 0; row < 행수; row++) {
+        for (let col = 0; col < 열수; col++) {
+          const cellLeft = col * (칸너비 + 간격);
+          const cellTop = row * (칸높이 + 간격);
+          const overlapsCamera =
+            cellLeft < cameraRight + cameraClearance &&
+            cellLeft + 칸너비 > cameraLeft - cameraClearance &&
+            cellTop < cameraBottom + cameraClearance &&
+            cellTop + 칸높이 > cameraTop - cameraClearance;
+          if (!overlapsCamera) 칸목록.push(row * 열수 + col);
+        }
+      }
+
+      for (let i = 칸목록.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [칸목록[i], 칸목록[j]] = [칸목록[j], 칸목록[i]];
+      }
+
+      const 한회생성수 = Math.ceil(칸목록.length / 24);
+      let 다음칸 = 0;
+      function 타일묶음생성() {
+        for (let i = 0; i < 한회생성수 && 다음칸 < 칸목록.length; i++) {
+          const 칸번호 = 칸목록[다음칸++];
+          const tile = document.createElement('img');
+          tile.className = 'memory-tile';
+          tile.src = 타일사진목록[Math.floor(Math.random() * 타일사진목록.length)];
+          tile.alt = '';
+          tile.draggable = false;
+          tile.style.gridColumn = String((칸번호 % 열수) + 1);
+          tile.style.gridRow = String(Math.floor(칸번호 / 열수) + 1);
+          tile.style.setProperty('--tile-rotation', ((Math.random() * 2.4) - 1.2).toFixed(2) + 'deg');
+          tileCover.appendChild(tile);
+          requestAnimationFrame(function () { tile.classList.add('revealed'); });
+        }
+
+        if (다음칸 < 칸목록.length) {
+          tileGenerationTimer = setTimeout(타일묶음생성, 200);
+        } else {
+          tileGenerationTimer = null;
+          타일배경생성완료();
+        }
+      }
+
+      requestAnimationFrame(function () {
+        tileCover.classList.add('active');
+        document.body.classList.add('tile-cover-active');
+        타일묶음생성();
+      });
+    }
+    function 예약엔딩동작(callback, delay) {
+      const timer = setTimeout(function () {
+        endingSequenceTimers = endingSequenceTimers.filter(function (item) { return item !== timer; });
+        callback();
+      }, delay);
+      endingSequenceTimers.push(timer);
+    }
+
+    function 무작위순서(목록) {
+      const 결과 = 목록.slice();
+      for (let i = 결과.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [결과[i], 결과[j]] = [결과[j], 결과[i]];
+      }
+      return 결과;
+    }
+
+    function 엔딩이미지등장(item) {
+      const image = document.createElement('img');
+      const x = item.x + (Math.random() * 2 - 1) * item.jitterX;
+      const y = item.y + (Math.random() * 2 - 1) * item.jitterY;
+      image.className = 'ending-object';
+      image.src = item.src;
+      image.alt = '';
+      image.draggable = false;
+      image.style.left = Math.max(0, Math.min(100, x)) + '%';
+      image.style.top = Math.max(0, Math.min(100, y)) + '%';
+      image.style.width = item.widthVw + 'vw';
+      image.style.setProperty('--ending-scale', item.scale);
+      image.style.setProperty('--ending-rotation', ((Math.random() * 5) - 2.5).toFixed(2) + 'deg');
+      endingObjectsEl.appendChild(image);
+      requestAnimationFrame(function () { image.classList.add('visible'); });
+    }
+
+    function 엔딩이미지순차생성(목록, 간격, 완료) {
+      const 순서 = 무작위순서(목록);
+      let index = 0;
+      function 다음이미지() {
+        if (index >= 순서.length) {
+          완료();
+          return;
+        }
+        엔딩이미지등장(순서[index++]);
+        예약엔딩동작(다음이미지, 간격);
+      }
+      다음이미지();
+    }
+
+    function 타일배경생성완료() {
+      엔딩이미지순차생성(엔딩이미지배치.playground, 500, function () {
+        엔딩이미지순차생성(엔딩이미지배치.people, 500, function () {
+          예약엔딩동작(function () {
+            상태 = 'ended';
+            endingBlurEl.classList.add('active');
+            endingScreen.classList.add('active');
+          }, 5500);
+        });
+      });
+    }
+    function 사라지기시작() {
+      if (상태 === "fading" || 상태 === "ended") return;
+      상태 = "fading";
+
+      if (걷기타이머) { clearInterval(걷기타이머); 걷기타이머 = null; }
+      if (인사타이머) { clearInterval(인사타이머); 인사타이머 = null; }
+
+      bubbleEl.classList.remove('show');
+      guideText.style.opacity = '0';
+      타일덮기시작();
+
+      // 멀리서 모래알처럼 스르륵 흐려지며 사라짐
+      charWrap.style.opacity = '0';
+      charEl.style.filter = 'blur(8px) drop-shadow(0 0 16px rgba(255,230,180,0.4))';
+
+
+    }
+
+    
+    function 다시시작() {
+      endingScreen.classList.remove('active');
+      endingSequenceTimers.forEach(function (timer) { clearTimeout(timer); });
+      endingSequenceTimers = [];
+      endingObjectsEl.innerHTML = '';
+      endingBlurEl.classList.remove('active');
+      if (tileGenerationTimer) clearTimeout(tileGenerationTimer);
+      tileGenerationTimer = null;
+      tileCover.classList.remove('active');
+      tileCover.innerHTML = '';
+      tileCover.dataset.started = 'false';
+      document.body.classList.remove('tile-cover-active');
+      document.getElementById('webcam-wrapper').style.opacity = String(웹캠투명도);
+      guideText.style.opacity = '1';
+      charWrap.style.opacity = '1';
+      charEl.style.filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.6))';
+      현재스케일 = 1.0;
+      charEl.style.transform = 'scale(1)';
+      마지막손흔듦시각 = 0;
       걷기시작();
     }
-  }
-}
 
-/* ──────────────────────────────────────────────────────────────
-   4. 사라짐 연출 (작아져서 완전히 사라짐 & 엔딩)
-────────────────────────────────────────────────────────────── */
-function 타일덮기시작() {
-  if (tileCover.dataset.started === 'true') return;
-  tileCover.dataset.started = 'true';
-  tileCover.innerHTML = '';
-  if (tileGenerationTimer) clearTimeout(tileGenerationTimer);
+    
+    function 손흔듦체크(손X, 현재시간) {
+      손X이력.push({ x: 손X, t: 현재시간 });
+      손X이력 = 손X이력.filter(p => 현재시간 - p.t < 900);
+      if (손X이력.length < 5) return false;
 
-  const 한칸크기 = Math.max(88, Math.min(150, Math.round(window.innerWidth / 11)));
-  const 간격 = 6;
-  const 열수 = Math.ceil(window.innerWidth / 한칸크기);
-  const 행수 = Math.ceil(window.innerHeight / 한칸크기);
-  const 칸너비 = (window.innerWidth - 간격 * (열수 - 1)) / 열수;
-  const 칸높이 = (window.innerHeight - 간격 * (행수 - 1)) / 행수;
-  const webcam = document.getElementById('webcam-wrapper');
-  const video = document.getElementById('webcam');
-  const visibleCamera = webcam.getBoundingClientRect();
-  const cameraWidth = window.innerWidth * 0.22;
-  const cameraAspect = video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 4 / 3;
-  const cameraLeft = visibleCamera.width > 0 ? visibleCamera.left : (window.innerWidth - cameraWidth) / 2;
-  const cameraTop = visibleCamera.height > 0 ? visibleCamera.top : (window.innerHeight - cameraWidth / cameraAspect) / 2;
-  const cameraRight = visibleCamera.width > 0 ? visibleCamera.right : cameraLeft + cameraWidth;
-  const cameraBottom = visibleCamera.height > 0 ? visibleCamera.bottom : cameraTop + cameraWidth / cameraAspect;
-  const cameraClearance = 6;
-  const 칸목록 = [];
-  tileCover.style.setProperty('--tile-cols', 열수);
-  tileCover.style.setProperty('--tile-rows', 행수);
+      let 방향전환 = 0;
+      let 이전부호 = 0;
 
-  for (let row = 0; row < 행수; row++) {
-    for (let col = 0; col < 열수; col++) {
-      const cellLeft = col * (칸너비 + 간격);
-      const cellTop = row * (칸높이 + 간격);
-      const overlapsCamera =
-        cellLeft < cameraRight + cameraClearance &&
-        cellLeft + 칸너비 > cameraLeft - cameraClearance &&
-        cellTop < cameraBottom + cameraClearance &&
-        cellTop + 칸높이 > cameraTop - cameraClearance;
-      if (!overlapsCamera) 칸목록.push(row * 열수 + col);
-    }
-  }
-
-  for (let i = 칸목록.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [칸목록[i], 칸목록[j]] = [칸목록[j], 칸목록[i]];
-  }
-
-  const 한회생성수 = Math.ceil(칸목록.length / 24);
-  let 다음칸 = 0;
-  function 타일묶음생성() {
-    for (let i = 0; i < 한회생성수 && 다음칸 < 칸목록.length; i++) {
-      const 칸번호 = 칸목록[다음칸++];
-      const tile = document.createElement('img');
-      tile.className = 'memory-tile';
-      tile.src = 타일사진목록[Math.floor(Math.random() * 타일사진목록.length)];
-      tile.alt = '';
-      tile.draggable = false;
-      tile.style.gridColumn = String((칸번호 % 열수) + 1);
-      tile.style.gridRow = String(Math.floor(칸번호 / 열수) + 1);
-      tile.style.setProperty('--tile-rotation', ((Math.random() * 2.4) - 1.2).toFixed(2) + 'deg');
-      tileCover.appendChild(tile);
-      requestAnimationFrame(function() { tile.classList.add('revealed'); });
-    }
-
-    if (다음칸 < 칸목록.length) {
-      tileGenerationTimer = setTimeout(타일묶음생성, 200);
-    } else {
-      tileGenerationTimer = null;
-      타일배경생성완료();
-    }
-  }
-
-  requestAnimationFrame(function() {
-    tileCover.classList.add('active');
-    document.body.classList.add('tile-cover-active');
-    타일묶음생성();
-  });
-}
-function 예약엔딩동작(callback, delay) {
-  const timer = setTimeout(function() {
-    endingSequenceTimers = endingSequenceTimers.filter(function(item) { return item !== timer; });
-    callback();
-  }, delay);
-  endingSequenceTimers.push(timer);
-}
-
-function 무작위순서(목록) {
-  const 결과 = 목록.slice();
-  for (let i = 결과.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [결과[i], 결과[j]] = [결과[j], 결과[i]];
-  }
-  return 결과;
-}
-
-function 엔딩이미지등장(item) {
-  const image = document.createElement('img');
-  const x = item.x + (Math.random() * 2 - 1) * item.jitterX;
-  const y = item.y + (Math.random() * 2 - 1) * item.jitterY;
-  image.className = 'ending-object';
-  image.src = item.src;
-  image.alt = '';
-  image.draggable = false;
-  image.style.left = Math.max(0, Math.min(100, x)) + '%';
-  image.style.top = Math.max(0, Math.min(100, y)) + '%';
-  image.style.width = item.widthVw + 'vw';
-  image.style.setProperty('--ending-scale', item.scale);
-  image.style.setProperty('--ending-rotation', ((Math.random() * 5) - 2.5).toFixed(2) + 'deg');
-  endingObjectsEl.appendChild(image);
-  requestAnimationFrame(function() { image.classList.add('visible'); });
-}
-
-function 엔딩이미지순차생성(목록, 간격, 완료) {
-  const 순서 = 무작위순서(목록);
-  let index = 0;
-  function 다음이미지() {
-    if (index >= 순서.length) {
-      완료();
-      return;
-    }
-    엔딩이미지등장(순서[index++]);
-    예약엔딩동작(다음이미지, 간격);
-  }
-  다음이미지();
-}
-
-function 타일배경생성완료() {
-  엔딩이미지순차생성(엔딩이미지배치.playground, 500, function() {
-    엔딩이미지순차생성(엔딩이미지배치.people, 500, function() {
-      예약엔딩동작(function() {
-        상태 = 'ended';
-        endingBlurEl.classList.add('active');
-        endingScreen.classList.add('active');
-      }, 5500);
-    });
-  });
-}
-function 사라지기시작() {
-  if (상태 === "fading" || 상태 === "ended") return;
-  상태 = "fading";
-
-  if (걷기타이머) { clearInterval(걷기타이머); 걷기타이머 = null; }
-  if (인사타이머) { clearInterval(인사타이머); 인사타이머 = null; }
-
-  bubbleEl.classList.remove('show');
-  guideText.style.opacity = '0';
-  타일덮기시작();
-
-  // 멀리서 모래알처럼 스르륵 흐려지며 사라짐
-  charWrap.style.opacity = '0';
-  charEl.style.filter = 'blur(8px) drop-shadow(0 0 16px rgba(255,230,180,0.4))';
-
-
-}
-
-/* ──────────────────────────────────────────────────────────────
-   다시 시작 함수
-────────────────────────────────────────────────────────────── */
-function 다시시작() {
-  endingScreen.classList.remove('active');
-  endingSequenceTimers.forEach(function(timer) { clearTimeout(timer); });
-  endingSequenceTimers = [];
-  endingObjectsEl.innerHTML = '';
-  endingBlurEl.classList.remove('active');
-  if (tileGenerationTimer) clearTimeout(tileGenerationTimer);
-  tileGenerationTimer = null;
-  tileCover.classList.remove('active');
-  tileCover.innerHTML = '';
-  tileCover.dataset.started = 'false';
-  document.body.classList.remove('tile-cover-active');
-  document.getElementById('webcam-wrapper').style.opacity = String(웹캠투명도);
-  guideText.style.opacity = '1';
-  charWrap.style.opacity = '1';
-  charEl.style.filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.6))';
-  현재스케일 = 1.0;
-  charEl.style.transform = 'scale(1)';
-  마지막손흔듦시각 = 0;
-  걷기시작();
-}
-
-/* ──────────────────────────────────────────────────────────────
-   손 흔들기(Waving) 제스처 판별
-────────────────────────────────────────────────────────────── */
-function 손흔듦체크(손X, 현재시간) {
-  손X이력.push({ x: 손X, t: 현재시간 });
-  손X이력 = 손X이력.filter(p => 현재시간 - p.t < 900);
-  if (손X이력.length < 5) return false;
-
-  let 방향전환 = 0;
-  let 이전부호 = 0;
-
-  for (let i = 1; i < 손X이력.length; i++) {
-    let dx = 손X이력[i].x - 손X이력[i-1].x;
-    if (Math.abs(dx) > 0.014) {
-      let 부호 = dx > 0 ? 1 : -1;
-      if (이전부호 !== 0 && 부호 !== 이전부호) {
-        방향전환++;
-      }
-      이전부호 = 부호;
-    }
-  }
-
-  return 방향전환 >= 2;
-}
-
-/* ──────────────────────────────────────────────────────────────
-   MediaPipe 손 감지 루프
-────────────────────────────────────────────────────────────── */
-function 손추적루프() {
-  requestAnimationFrame(손추적루프);
-
-  let video = document.getElementById('webcam');
-  if (!handLandmarker || !video || video.readyState < 2) return;
-
-  let now = performance.now();
-  let results = handLandmarker.detectForVideo(video, now);
-
-  if (results.landmarks && results.landmarks.length > 0) {
-    let lm = results.landmarks[0];
-    let 손목 = lm[0];
-    let 중지 = lm[12];
-
-    // 손바닥이 펴져 있는지 확인
-    let 손펴짐 = Math.hypot(중지.x - 손목.x, 중지.y - 손목.y) > 0.20;
-    let 흔듦   = 손펴짐 && 손흔듦체크(손목.x, now);
-
-    if (흔듦) {
-      마지막손흔듦시각 = now; // 흔드는 동안 계속 시간 갱신!
-
-      // 걸어가는 중이었다면 멈춰서서 인사 시작!
-      if (상태 === "walk") {
-        인사하기시작();
-      }
-    }
-  }
-}
-
-/* ──────────────────────────────────────────────────────────────
-   MediaPipe 초기화
-────────────────────────────────────────────────────────────── */
-async function MediaPipe초기화() {
-  try {
-    let mp = await import(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs'
-    );
-    let filesetResolver = await mp.FilesetResolver.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
-    );
-    handLandmarker = await mp.HandLandmarker.createFromOptions(filesetResolver, {
-      baseOptions: {
-        modelAssetPath:
-          'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-        delegate: 'GPU'
-      },
-      runningMode: 'VIDEO',
-      numHands: 1
-    });
-
-    handDot.className = 'ready';
-    handLabel.innerText = '손 감지 준비됨';
-    requestAnimationFrame(손추적루프);
-  } catch (e) {
-    console.warn('MediaPipe 로드 실패 (마우스로 대체):', e);
-    handLabel.innerText = '마우스 모드 (화면 위쪽을 흔들어보세요)';
-  }
-}
-
-/* ──────────────────────────────────────────────────────────────
-   웹캠 시작
-────────────────────────────────────────────────────────────── */
-function 웹캠시작() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    handLabel.innerText = '마우스 모드';
-    return;
-  }
-
-  navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
-    .then(function(stream) {
-      let video   = document.getElementById('webcam');
-      let wrapper = document.getElementById('webcam-wrapper');
-      video.srcObject = stream;
-      video.onloadedmetadata = function() {
-        video.play();
-        웹캠크기조절();
-        wrapper.style.display = 'block';
-        wrapper.style.opacity = String(웹캠투명도);
-        video.style.filter = 'grayscale(100%)';
-        MediaPipe초기화();
-      };
-    })
-    .catch(function(err) {
-      console.warn('웹캠 접근 실패:', err);
-      handLabel.innerText = '마우스 모드';
-    });
-
-  window.addEventListener('resize', 웹캠크기조절);
-}
-
-function 웹캠크기조절() {
-  let video   = document.getElementById('webcam');
-  let wrapper = document.getElementById('webcam-wrapper');
-  let 너비    = window.innerWidth * 웹캠크기비율;
-  let 비율    = (video.videoWidth && video.videoHeight)
-                  ? video.videoWidth / video.videoHeight : 4/3;
-  wrapper.style.width  = 너비 + 'px';
-  wrapper.style.height = (너비 / 비율) + 'px';
-  video.style.width  = '100%';
-  video.style.height = '100%';
-}
-
-/* ──────────────────────────────────────────────────────────────
-   마우스 폴백 (화면 상단에서 좌우로 움직이면 손 흔들기 커서 & 인사)
-────────────────────────────────────────────────────────────── */
-let 마우스이력 = [];
-
-function 마우스이벤트연결() {
-  window.addEventListener('mousemove', function(e) {
-    customCursor.style.left = e.clientX + 'px';
-    customCursor.style.top  = e.clientY + 'px';
-
-    // 화면 가운데 기준 상단에 마우스가 위치할 때
-    if (e.clientY < window.innerHeight / 2) {
-      customCursor.style.display = 'block';
-
-      if (!커서타이머) {
-        커서타이머 = setInterval(function() {
-          커서인덱스 = (커서인덱스 + 1) % 손커서프레임.length;
-          customCursor.src = 손커서프레임[커서인덱스];
-        }, 110);
+      for (let i = 1; i < 손X이력.length; i++) {
+        let dx = 손X이력[i].x - 손X이력[i - 1].x;
+        if (Math.abs(dx) > 0.014) {
+          let 부호 = dx > 0 ? 1 : -1;
+          if (이전부호 !== 0 && 부호 !== 이전부호) {
+            방향전환++;
+          }
+          이전부호 = 부호;
+        }
       }
 
-      // 좌우 흔들림 감지
+      return 방향전환 >= 2;
+    }
+
+    
+    function 손추적루프() {
+      requestAnimationFrame(손추적루프);
+
+      let video = document.getElementById('webcam');
+      if (!handLandmarker || !video || video.readyState < 2) return;
+
       let now = performance.now();
-      마우스이력.push({ x: e.clientX, t: now });
-      마우스이력 = 마우스이력.filter(p => now - p.t < 800);
+      let results = handLandmarker.detectForVideo(video, now);
 
-      if (마우스이력.length > 5) {
-        let diff = Math.abs(e.clientX - 마우스이력[0].x);
-        if (diff > 70) { // 활발히 흔드는 중
-          마지막손흔듦시각 = now;
+      if (results.landmarks && results.landmarks.length > 0) {
+        let lm = results.landmarks[0];
+        let 손목 = lm[0];
+        let 중지 = lm[12];
+
+        // 손바닥이 펴져 있는지 확인
+        let 손펴짐 = Math.hypot(중지.x - 손목.x, 중지.y - 손목.y) > 0.20;
+        let 흔듦 = 손펴짐 && 손흔듦체크(손목.x, now);
+
+        if (흔듦) {
+          마지막손흔듦시각 = now; // 흔드는 동안 계속 시간 갱신!
+
+          // 걸어가는 중이었다면 멈춰서서 인사 시작!
           if (상태 === "walk") {
             인사하기시작();
           }
         }
       }
-    } else {
-      customCursor.style.display = 'none';
-      if (커서타이머) { clearInterval(커서타이머); 커서타이머 = null; }
     }
-  });
 
-  window.addEventListener('mouseleave', function() {
-    customCursor.style.display = 'none';
-    if (커서타이머) { clearInterval(커서타이머); 커서타이머 = null; }
-  });
-}
-</script>
+    
+    async function MediaPipe초기화() {
+      try {
+        let mp = await import(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs'
+        );
+        let filesetResolver = await mp.FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
+        );
+        handLandmarker = await mp.HandLandmarker.createFromOptions(filesetResolver, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+            delegate: 'GPU'
+          },
+          runningMode: 'VIDEO',
+          numHands: 1
+        });
+
+        handDot.className = 'ready';
+        handLabel.innerText = '손 감지 준비됨';
+        requestAnimationFrame(손추적루프);
+      } catch (e) {
+        console.warn('MediaPipe 로드 실패 (마우스로 대체):', e);
+        handLabel.innerText = '마우스 모드 (화면 위쪽을 흔들어보세요)';
+      }
+    }
+
+    
+    function 웹캠시작() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        handLabel.innerText = '마우스 모드';
+        return;
+      }
+
+      navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
+        .then(function (stream) {
+          let video = document.getElementById('webcam');
+          let wrapper = document.getElementById('webcam-wrapper');
+          video.srcObject = stream;
+          video.onloadedmetadata = function () {
+            video.play();
+            웹캠크기조절();
+            wrapper.style.display = 'block';
+            wrapper.style.opacity = String(웹캠투명도);
+            video.style.filter = 'grayscale(100%)';
+            MediaPipe초기화();
+          };
+        })
+        .catch(function (err) {
+          console.warn('웹캠 접근 실패:', err);
+          handLabel.innerText = '마우스 모드';
+        });
+
+      window.addEventListener('resize', 웹캠크기조절);
+    }
+
+    function 웹캠크기조절() {
+      let video = document.getElementById('webcam');
+      let wrapper = document.getElementById('webcam-wrapper');
+      let 너비 = window.innerWidth * 웹캠크기비율;
+      let 비율 = (video.videoWidth && video.videoHeight)
+        ? video.videoWidth / video.videoHeight : 4 / 3;
+      wrapper.style.width = 너비 + 'px';
+      wrapper.style.height = (너비 / 비율) + 'px';
+      video.style.width = '100%';
+      video.style.height = '100%';
+    }
+
+    
+    let 마우스이력 = [];
+
+    function 마우스이벤트연결() {
+      window.addEventListener('mousemove', function (e) {
+        customCursor.style.left = e.clientX + 'px';
+        customCursor.style.top = e.clientY + 'px';
+
+        // 화면 가운데 기준 상단에 마우스가 위치할 때
+        if (e.clientY < window.innerHeight / 2) {
+          customCursor.style.display = 'block';
+
+          if (!커서타이머) {
+            커서타이머 = setInterval(function () {
+              커서인덱스 = (커서인덱스 + 1) % 손커서프레임.length;
+              customCursor.src = 손커서프레임[커서인덱스];
+            }, 110);
+          }
+
+          // 좌우 흔들림 감지
+          let now = performance.now();
+          마우스이력.push({ x: e.clientX, t: now });
+          마우스이력 = 마우스이력.filter(p => now - p.t < 800);
+
+          if (마우스이력.length > 5) {
+            let diff = Math.abs(e.clientX - 마우스이력[0].x);
+            if (diff > 70) { // 활발히 흔드는 중
+              마지막손흔듦시각 = now;
+              if (상태 === "walk") {
+                인사하기시작();
+              }
+            }
+          }
+        } else {
+          customCursor.style.display = 'none';
+          if (커서타이머) { clearInterval(커서타이머); 커서타이머 = null; }
+        }
+      });
+
+      window.addEventListener('mouseleave', function () {
+        customCursor.style.display = 'none';
+        if (커서타이머) { clearInterval(커서타이머); 커서타이머 = null; }
+      });
+    }
+  </script>
 </body>
+
 </html>

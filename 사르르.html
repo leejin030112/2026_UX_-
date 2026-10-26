@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>사르르 — 사라져가는 흙놀이터</title>
+  <title>모래랑 친구와 이제 안녕</title>
   <style>
     * {
       margin: 0;
@@ -21,7 +21,7 @@
     }
 
 
-    /* ── 왼쪽 프로젝트 소개 ── */
+    
     #project-intro {
       position: fixed;
       top: 50%;
@@ -99,7 +99,7 @@
       }
     }
 
-    /* 웹캠 — 화면 정중앙, Three.js 캔버스(z:2)보다 뒤(z:1) */
+    
     #webcam-wrapper {
       position: fixed;
       top: 50%;
@@ -143,10 +143,10 @@
     #webcam {
       display: block;
       transform: scaleX(-1);
-      /* 거울 반전 */
+      
     }
 
-    /* 오른쪽 손 이미지를 안녕 페이지 이동 버튼으로 사용 */
+    
     #hand-next-link {
       position: fixed;
       top: 50%;
@@ -519,7 +519,7 @@
       outline-offset: 3px;
     }
 
-    /* Three.js 캔버스 */
+    
     canvas:not(#hand-art) {
       position: fixed !important;
       top: 0 !important;
@@ -528,7 +528,7 @@
       pointer-events: none !important;
     }
 
-    /* ── UI 오버레이 ────────────────────────────────────── */
+    
     #overlay {
       position: fixed;
       top: 0;
@@ -653,7 +653,7 @@
       box-shadow: 0 0 12px #ffe6b4;
     }
 
-    /* ── 두 손 모으기 전체 리셋 진행 표시기 ── */
+    
     #reset-indicator {
       position: fixed;
       top: 50%;
@@ -698,7 +698,7 @@
       color: #c8b89a;
     }
 
-    /* ── 상단 모래놀이터 3종 PLY 미리보기 네비게이션 ── */
+    
     #playground-nav {
       position: fixed;
       top: 18px;
@@ -875,7 +875,7 @@
       display: none;
     }
 
-    /* 알림 토스트 */
+    
     #toast-msg {
       position: fixed;
       top: 130px;
@@ -926,7 +926,7 @@
       }
     }
 
-    /* 왼쪽 필름 스트립: 노란 띠 안에서 이미지가 아래에서 위로 반복됩니다. */
+    
     #left-film-strip {
       position: fixed;
       inset: 0 auto 0 0;
@@ -1042,7 +1042,7 @@
       </div>
     </div>
   </aside>
-  <!-- ── 왼쪽 프로젝트 소개 ── -->
+  
   <aside id="project-intro" aria-label="프로젝트 소개">
     <h1>모래랑<br>친구와<br>이제<br>안녕</h1>
     <p class="intro-lead">우리는 그날이 마지막인줄 모르고 헤어졌다.<br></p>
@@ -1053,9 +1053,9 @@
   </aside>
 
 
-  <!-- ── 상단 모래놀이터 3종 PLY 미리보기 네비게이션 ── -->
+  
   <nav id="playground-nav" aria-label="모래놀이터 공간 선택">
-    <!-- 1. 기존 모래놀이터기구 -->
+    
     <button class="playground-btn active" id="btn-ply-0" onclick="놀이터모델선택(0)" aria-pressed="true" title="기존 모래놀이터기구">
       <div class="playground-circle" id="circle-0">
         <img id="playground-thumb-0" class="circle-thumb" alt="기존 모래놀이터기구 미리보기" />
@@ -1066,7 +1066,7 @@
       <span class="playground-label">모래놀이터</span>
     </button>
 
-    <!-- 2. 모래장 그네 -->
+    
     <button class="playground-btn" id="btn-ply-1" onclick="놀이터모델선택(1)" aria-pressed="false" title="모래장 그네">
       <div class="playground-circle" id="circle-1">
         <img id="playground-thumb-1" class="circle-thumb" alt="모래장 그네 미리보기" />
@@ -1077,7 +1077,7 @@
       <span class="playground-label">모래장 그네</span>
     </button>
 
-    <!-- 3. 모래놀이장 -->
+    
     <button class="playground-btn" id="btn-ply-2" onclick="놀이터모델선택(2)" aria-pressed="false" title="모래놀이장">
       <div class="playground-circle" id="circle-2">
         <img id="playground-thumb-2" class="circle-thumb" alt="모래놀이장 미리보기" />
@@ -1089,7 +1089,7 @@
     </button>
   </nav>
 
-  <!-- 전환 알림 토스트 -->
+  
   <div id="toast-msg"></div>
 
   <div id="webcam-wrapper">
@@ -1102,7 +1102,7 @@
       id="hand-label-image" src="손 텍스트.png" alt="" draggable="false"><span class="friend-hold-progress"
       aria-hidden="true"></span></a>
 
-  <!-- 두 손 모아 2초 리셋 프로그레스 UI -->
+  
   <div id="reset-indicator">
     <svg class="progress-ring" width="120" height="120">
       <circle stroke="rgba(200, 184, 154, 0.2)" stroke-width="6" fill="transparent" r="52" cx="60" cy="60" />
@@ -1155,16 +1155,14 @@
 
 
 
-  <!-- Three.js r128 + PLYLoader -->
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
 
   <script>
     "use strict";
 
-    /* ══════════════════════════════════════════════════════════════
-       ★ 조정 변수 모음
-    ══════════════════════════════════════════════════════════════ */
+    
 
     // ── 점 구름 ──────────────────────────────────────────────────
     let 점증폭배수 = 3;         // 정점(point) 개수 3배 증폭 생성
@@ -1188,9 +1186,7 @@
     let 웹캠투명도 = 0.70;
     let 웹캠흑백 = true;
 
-    /* ══════════════════════════════════════════════════════════════
-       전역 변수
-    ══════════════════════════════════════════════════════════════ */
+    
 
     let 장면, 카메라, 렌더러;
     let 점구름 = null;
@@ -1294,9 +1290,7 @@
     // 타이밍
     let 이전시간 = 0;
 
-    /* ══════════════════════════════════════════════════════════════
-       진입점
-    ══════════════════════════════════════════════════════════════ */
+    
     let 페이지배경음 = null;
     let 모래흐름음 = null;
     let 효과음파일 = {};
@@ -1493,9 +1487,7 @@
       requestAnimationFrame(애니메이션루프);
     });
 
-    /* ──────────────────────────────────────────────────────────────
-       Three.js 장면 초기화
-    ────────────────────────────────────────────────────────────── */
+    
     function Three장면초기화() {
       장면 = new THREE.Scene();
       손가락표시도트 = new THREE.Mesh(
@@ -1543,12 +1535,7 @@
       기억사진들초기화();
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       ★ 3차원 가상 기억 사진들 (test1.jpg ~ test9.jpg)
-       - 3차원 가상 공간 속 랜덤 위치에 배치
-       - 평소에는 숨겨져 있다가(opacity: 0)
-       - PLY가 완전히 흩어졌을 때 공간 속에 부드럽게 떠오름!
-    ────────────────────────────────────────────────────────────── */
+    
     function 기억사진들초기화() {
       사진그룹 = new THREE.Group();
       장면.add(사진그룹);
@@ -1612,9 +1599,7 @@
       });
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       ★ 기억 사진들 페이드인/아웃 & 부유 애니메이션
-    ────────────────────────────────────────────────────────────── */
+    
     function 기억사진업데이트(현재시간) {
       if (!사진그룹) return;
 
@@ -1666,12 +1651,7 @@
         };
       }
     }
-    /* ──────────────────────────────────────────────────────────────
-       ★ 3종 모래놀이터 PLY 관리 및 미리보기 시스템
-       1. sandplayground1 (sandplayground.ply) — 기존 모래놀이터기구
-       2. sandplayground2 (sandplayground2.ply) — 모래장 그네
-       3. sandplayground3 (sandplayground3.ply) — 모래놀이장
-    ────────────────────────────────────────────────────────────── */
+    
     const 놀이터목록 = [
       {
         id: 'sandplayground1',
@@ -2224,9 +2204,7 @@
       }, 2400);
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       ★ PLY 점 구름 생성 (Point 개수 3배 증폭 생성)
-    ────────────────────────────────────────────────────────────── */
+    
     function PLY점구름만들기(geometry) {
       let posAttr = geometry.getAttribute('position');
       let colorAttr = geometry.getAttribute('color');
@@ -2374,9 +2352,7 @@
       console.log(`점 구름 생성 완료: 원본 ${원본점수}개 → 3배 증폭 ${점수}개`);
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       MediaPipe 초기화 (numHands: 2)
-    ────────────────────────────────────────────────────────────── */
+    
     async function MediaPipe초기화() {
       try {
         let mp = await import(
@@ -2405,9 +2381,7 @@
       }
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       손가락 상태 분석 헬퍼
-    ────────────────────────────────────────────────────────────── */
+    
     function 거리(p1, p2) {
       let dx = p1.x - p2.x, dy = p1.y - p2.y, dz = (p1.z || 0) - (p2.z || 0);
       return Math.sqrt(dx * dx + dy * dy + dz * dz);
@@ -2430,9 +2404,7 @@
       return { 펴진손가락수, 활짝, 주먹, 한손가락만 };
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       ★ 전체 리셋 함수 (위치, 회전, 입자, 상태 초기화)
-    ────────────────────────────────────────────────────────────── */
+    
     function 전체리셋실행() {
       모래흐름사운드동기화(false);
       기억사운드예약취소();
@@ -2497,9 +2469,7 @@
       label.innerText = '✨ 전체 초기화 완료';
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       ★ 웹캠 손 추적 업데이트
-    ────────────────────────────────────────────────────────────── */
+    
     function 손추적업데이트(delta) {
       let 모래흐름사운드필요 = false;
       let 손가락유지확인됨 = false;
@@ -2736,9 +2706,7 @@
       모래흐름사운드동기화(모래흐름사운드필요);
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       ★ 점 위치 업데이트 (영구 흩어짐 및 리셋 복구)
-    ────────────────────────────────────────────────────────────── */
+    
     function 손가락반경표시(화면X, 화면Y, 표시) {
       const ring = document.getElementById('finger-radius-ring');
       if (!ring) return;
@@ -2848,9 +2816,7 @@
 
       pos.needsUpdate = true;
     }
-    /* ──────────────────────────────────────────────────────────────
-       ★ 모델 회전 및 부드러운 감속
-    ────────────────────────────────────────────────────────────── */
+    
     function 모델회전업데이트() {
       if (!점구름) return;
 
@@ -2866,9 +2832,7 @@
       if (Math.abs(회전속도Y) < 0.0001) 회전속도Y = 0;
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       애니메이션 루프
-    ────────────────────────────────────────────────────────────── */
+    
     function 애니메이션루프(현재시간) {
       requestAnimationFrame(애니메이션루프);
 
@@ -2883,9 +2847,7 @@
       렌더러.render(장면, 카메라);
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       마우스 이벤트
-    ────────────────────────────────────────────────────────────── */
+    
     function 마우스이벤트연결() {
       window.addEventListener('mousedown', function (e) {
         마우스누름 = true;
@@ -2950,9 +2912,7 @@
       window.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       키보드 단축키 연결 (R: 전체 리셋 비상용)
-    ────────────────────────────────────────────────────────────── */
+    
     function 키보드이벤트연결() {
       window.addEventListener('keydown', function (e) {
         if (e.key === 'r' || e.key === 'R' || e.key === 'ㄱ') {
@@ -2961,9 +2921,7 @@
       });
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       웹캠 시작
-    ────────────────────────────────────────────────────────────── */
+    
     function 웹캠시작() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         document.getElementById('hint-webcam').style.display = 'block';
@@ -3004,9 +2962,7 @@
       video.style.height = '100%';
     }
 
-    /* ──────────────────────────────────────────────────────────────
-       드래그 앤 드롭 파일 로드
-    ────────────────────────────────────────────────────────────── */
+    
     function 드래그드롭이벤트연결() {
       let dropZone = document.getElementById('drop-zone');
       let fileInput = document.getElementById('file-input');
