@@ -1,0 +1,2737 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사르르 — 사라져가는 흙놀이터</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0804;
+      overflow: hidden;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      color: #c8b89a;
+      user-select: none;
+    }
+
+
+    /* ── 왼쪽 프로젝트 소개 ── */
+    #project-intro {
+      position: fixed;
+      top: 50%;
+      left: calc(clamp(39px, 4.67vw, 64px) + clamp(16px, 2vw, 28px));
+      transform: translateY(-50%);
+      width: min(30vw, 420px);
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      z-index: 5;
+      color: rgba(238, 236, 230, 0.78);
+      font-size: 0.94rem;
+      line-height: 1.9;
+      letter-spacing: -0.015em;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
+      user-select: text;
+      pointer-events: none;
+    }
+
+    #project-intro::-webkit-scrollbar {
+      display: none;
+    }
+
+    #project-intro h1 {
+      margin: 0 0 34px;
+      color: #fff;
+      font-size: clamp(4.5rem, 7vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.075em;
+    }
+
+    #project-intro p {
+      margin: 0;
+    }
+
+    #project-intro .intro-lead {
+      color: #fff;
+      font-weight: 700;
+      line-height: 1.75;
+    }
+
+    #project-intro .project-description {
+      margin-top: 28px;
+    }
+
+    @media (max-width: 900px) {
+      #project-intro {
+        top: 78px;
+        bottom: 18px;
+        left: calc(clamp(39px, 4.67vw, 64px) + 16px);
+        transform: none;
+        width: min(44vw, 370px);
+        max-height: none;
+        font-size: 0.88rem;
+        line-height: 1.85;
+      }
+
+      #project-intro h1 {
+        margin-bottom: 30px;
+        font-size: clamp(3.8rem, 8vw, 5.5rem);
+      }
+    }
+
+    @media (max-width: 600px) {
+      #project-intro {
+        left: calc(clamp(39px, 4.67vw, 64px) + 12px);
+        width: calc(100vw - clamp(39px, 4.67vw, 64px) - 36px);
+        font-size: 0.84rem;
+        line-height: 1.85;
+      }
+
+      #project-intro h1 {
+        font-size: clamp(3.8rem, 16vw, 5.3rem);
+      }
+    }
+
+    /* 웹캠 — 화면 정중앙, Three.js 캔버스(z:2)보다 뒤(z:1) */
+    #webcam-wrapper {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      border: 1px solid rgba(200, 184, 154, 0.35);
+      border-radius: 4px;
+      overflow: hidden;
+      display: none;
+      pointer-events: none;
+    }
+
+    #ply-text-entry {
+      position: fixed;
+      top: calc(50% - 8.25vw - 8px);
+      left: 50%;
+      transform: translate(-50%, -300%);
+      z-index: 3;
+      display: none;
+      width: 22vw;
+      max-height: 18vh;
+      box-sizing: border-box;
+      overflow-y: auto;
+      color: #7d7d7d;
+      font-size: 0.78rem;
+      font-weight: 400;
+      line-height: 1.55;
+      text-align: left;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      outline: none;
+      pointer-events: auto;
+      cursor: text;
+    }
+
+    #ply-text-entry.is-visible {
+      display: block;
+    }
+
+    #webcam {
+      display: block;
+      transform: scaleX(-1);
+      /* 거울 반전 */
+    }
+
+    /* 오른쪽 손 이미지를 안녕 페이지 이동 버튼으로 사용 */
+    #hand-next-link {
+      position: fixed;
+      top: 50%;
+      right: -15vw;
+      width: 50vw;
+      max-height: 78vh;
+      display: block;
+      transform: translateY(-50%);
+      z-index: 4;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #hand-next-link.is-scattered-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #hand-next-link {
+      transition: opacity 0.8s ease;
+    }
+
+    #finger-radius-ring {
+      position: fixed;
+      z-index: 24;
+      display: none;
+      width: var(--finger-radius-size, 150px);
+      height: var(--finger-radius-size, 150px);
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.62);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    #finger-radius-ring {
+      border-color: rgba(255, 244, 221, 0.6);
+      border-style: dashed;
+    }
+
+    #finger-radius-ring::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translate(-50%, -50%);
+    }
+
+    #photo-hold-progress {
+      position: fixed;
+      inset: auto;
+      left: 0;
+      top: 0;
+      z-index: 35;
+      width: 42px;
+      height: 42px;
+      transform: translate(-50%, -50%);
+    }
+
+    #photo-hold-progress.show {
+      display: flex;
+    }
+
+    #music-toggle {
+      position: fixed;
+      top: 56px;
+      right: 20px;
+      z-index: 100;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(10, 8, 4, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 50%;
+      font: inherit;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #music-toggle:hover {
+      border-color: rgba(255, 255, 255, 0.58);
+      color: #fff;
+    }
+
+    #left-film-strip {
+      transition: opacity 0.8s ease;
+    }
+
+    #left-film-strip.is-scattered-hidden {
+      opacity: 0;
+    }
+
+    #music-toggle.is-muted::after {
+      content: '×';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -56%);
+      color: #fff;
+      font: 400 25px/1 Arial, sans-serif;
+      pointer-events: none;
+    }
+
+    #photo-reader {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5vh 5vw;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.46);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      cursor: zoom-out;
+    }
+
+    #photo-reader.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    #photo-reader-image {
+      display: block;
+      max-width: min(88vw, 1200px);
+      max-height: 88vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      cursor: default;
+    }
+
+    #hand-art {
+      display: block;
+      width: 100%;
+      max-height: 78vh;
+      height: auto;
+      object-fit: contain;
+      image-rendering: pixelated;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #hand-art-source {
+      display: none;
+    }
+
+    #hand-label-image {
+      position: absolute;
+      left: 20%;
+      top: 9%;
+      z-index: 5;
+      display: block;
+      width: clamp(120px, 18vw, 260px);
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      scale: 160%
+    }
+
+    #hand-next-link:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+    }
+
+    /* Three.js 캔버스 */
+    canvas:not(#hand-art) {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 2 !important;
+      pointer-events: none !important;
+    }
+
+    /* ── UI 오버레이 ────────────────────────────────────── */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      pointer-events: none;
+    }
+
+    #status-msg {
+      font-size: 1.1rem;
+      color: #c8b89a;
+      letter-spacing: 0.1em;
+      text-align: center;
+      white-space: pre-wrap;
+      text-shadow: 0 0 16px rgba(0, 0, 0, 1);
+    }
+
+    #drop-zone {
+      display: none;
+      border: 1px dashed rgba(200, 184, 154, 0.5);
+      border-radius: 8px;
+      padding: 30px 50px;
+      text-align: center;
+      color: #a89070;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      pointer-events: all;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    #drop-zone:hover,
+    #drop-zone.drag-over {
+      border-color: rgba(200, 184, 154, 0.9);
+      color: #c8b89a;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    #hint-webcam {
+      position: fixed;
+      bottom: 14px;
+      left: 18px;
+      z-index: 10;
+      font-size: 0.65rem;
+      color: rgba(200, 184, 154, 0.35);
+      display: none;
+    }
+
+    #hint-control {
+      position: fixed;
+      bottom: 16px;
+      right: 20px;
+      z-index: 10;
+      font-size: 0.73rem;
+      color: #b8b8b8;
+      text-align: right;
+      line-height: 1.9;
+      display: none;
+      background: rgba(10, 8, 4, 0.7);
+      padding: 12px 16px;
+      border-radius: 0;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(6px);
+    }
+
+    #hand-status {
+      position: fixed;
+      top: 16px;
+      left: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #b8b8b8;
+      background: rgba(10, 8, 4, 0.7);
+      padding: 7px 14px;
+      border-radius: 0;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(4px);
+    }
+
+    #hand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #666;
+      transition: background 0.25s, box-shadow 0.25s;
+    }
+
+    #hand-dot.ready {
+      background: #5a8a5a;
+    }
+
+    #hand-dot.rotate {
+      background: #f0c040;
+      box-shadow: 0 0 8px #f0c040;
+    }
+
+    #hand-dot.fist {
+      background: #3894e6;
+      box-shadow: 0 0 8px #3894e6;
+    }
+
+    #hand-dot.super {
+      background: #ff7050;
+      box-shadow: 0 0 10px #ff7050;
+    }
+
+    #hand-dot.reset {
+      background: #ffe6b4;
+      box-shadow: 0 0 12px #ffe6b4;
+    }
+
+    /* ── 두 손 모으기 전체 리셋 진행 표시기 ── */
+    #reset-indicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 25;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      background: rgba(10, 8, 4, 0.82);
+      padding: 24px 32px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 230, 180, 0.4);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 220, 160, 0.2);
+      backdrop-filter: blur(8px);
+    }
+
+    .progress-ring {
+      transform: rotate(-90deg);
+      margin-bottom: 12px;
+    }
+
+    .progress-ring__circle {
+      stroke-dasharray: 326.7;
+      stroke-dashoffset: 326.7;
+      transition: stroke-dashoffset 0.05s linear;
+    }
+
+    #reset-text {
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      text-align: center;
+      color: #ffe6b4;
+      line-height: 1.5;
+    }
+
+    #reset-time {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      color: #c8b89a;
+    }
+
+    /* ── 상단 모래놀이터 3종 PLY 미리보기 네비게이션 ── */
+    #playground-nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 26px;
+      pointer-events: auto;
+    }
+
+    .playground-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0;
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .playground-btn:hover {
+      transform: none;
+    }
+
+    .playground-circle {
+      position: relative;
+      width: 78px;
+      height: 78px;
+      box-sizing: border-box;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .playground-btn:hover .playground-circle,
+    .playground-btn.active .playground-circle {
+      transform: none;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .circle-icon {
+      width: 40px;
+      height: 40px;
+      color: #fff;
+      filter: none;
+      transition: none;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .playground-btn:hover .circle-icon {
+      transform: none;
+      color: #fff;
+    }
+
+    .circle-thumb {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .circle-badge {
+      display: none;
+    }
+
+    .circle-spinner {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      pointer-events: none;
+    }
+
+    .circle-spinner.show {
+      display: flex;
+    }
+
+    .spinner-ring {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.24);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spinLoader 0.75s linear infinite;
+    }
+
+    @keyframes spinLoader {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .circle-spinner.holding .spinner-ring {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: conic-gradient(#fff var(--hold-progress, 0%), rgba(255, 255, 255, 0.16) 0);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+      animation: none;
+    }
+
+    .friend-hold-progress {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: 50%;
+      background: conic-gradient(#fff var(--hold-progress, 0%), transparent 0);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    #hand-next-link.holding .friend-hold-progress {
+      opacity: 1;
+    }
+
+    .hand-pixel-transition {
+      position: fixed;
+      z-index: 100;
+      pointer-events: none;
+      image-rendering: pixelated;
+    }
+
+    .playground-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      color: #b8b8b8;
+      text-shadow: none;
+      transition: none;
+      white-space: nowrap;
+    }
+
+    .playground-btn:hover .playground-label,
+    .playground-btn.active .playground-label {
+      color: #fff;
+      font-weight: 600;
+      text-shadow: none;
+    }
+
+    .playground-sub {
+      display: none;
+    }
+
+    /* 알림 토스트 */
+    #toast-msg {
+      position: fixed;
+      top: 130px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      z-index: 50;
+      padding: 9px 20px;
+      background: rgba(10, 8, 4, 0.88);
+      border: 1px solid rgba(255, 220, 140, 0.45);
+      border-radius: 20px;
+      font-size: 0.83rem;
+      color: #ffe6b4;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(255, 220, 140, 0.2);
+    }
+
+    #toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .playground-circle {
+        width: 62px;
+        height: 62px;
+      }
+
+      .circle-icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      #playground-nav {
+        gap: 14px;
+        top: 12px;
+      }
+
+      .playground-label {
+        font-size: 0.7rem;
+      }
+
+      .playground-sub {
+        display: none;
+      }
+    }
+
+    /* 왼쪽 필름 스트립: 노란 띠 안에서 이미지가 아래에서 위로 반복됩니다. */
+    #left-film-strip {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: clamp(39px, 4.67vw, 64px);
+      overflow: hidden;
+      z-index: 4;
+      pointer-events: none;
+      background: #d6a900;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    #left-film-strip .film-strip-track {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      animation: film-strip-scroll 28s linear infinite;
+      will-change: transform;
+    }
+
+    #left-film-strip .film-strip-set {
+      display: flex;
+      flex: 0 0 auto;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+      padding-bottom: 5px;
+      box-sizing: border-box;
+    }
+
+    #left-film-strip img {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      box-sizing: border-box;
+      padding: 10%;
+      object-fit: contain;
+      background: #d6a900;
+    }
+
+    @keyframes film-strip-scroll {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-50%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #left-film-strip .film-strip-track {
+        animation-duration: 90s;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside id="left-film-strip" aria-hidden="true">
+    <div class="film-strip-track">
+      <div class="film-strip-set">
+        <img src="f1.png" alt="" draggable="false"><img src="f2.png" alt="" draggable="false"><img src="f3.png" alt=""
+          draggable="false"><img src="f4.png" alt="" draggable="false"><img src="f5.png" alt="" draggable="false"><img
+          src="f6.png" alt="" draggable="false">
+        <img src="f1.png" alt="" draggable="false"><img src="f2.png" alt="" draggable="false"><img src="f3.png" alt=""
+          draggable="false"><img src="f4.png" alt="" draggable="false"><img src="f5.png" alt="" draggable="false"><img
+          src="f6.png" alt="" draggable="false">
+      </div>
+      <div class="film-strip-set">
+        <img src="f1.png" alt="" draggable="false"><img src="f2.png" alt="" draggable="false"><img src="f3.png" alt=""
+          draggable="false"><img src="f4.png" alt="" draggable="false"><img src="f5.png" alt="" draggable="false"><img
+          src="f6.png" alt="" draggable="false">
+        <img src="f1.png" alt="" draggable="false"><img src="f2.png" alt="" draggable="false"><img src="f3.png" alt=""
+          draggable="false"><img src="f4.png" alt="" draggable="false"><img src="f5.png" alt="" draggable="false"><img
+          src="f6.png" alt="" draggable="false">
+      </div>
+    </div>
+  </aside>
+  <!-- ── 왼쪽 프로젝트 소개 ── -->
+  <aside id="project-intro" aria-label="프로젝트 소개">
+    <h1>모래랑<br>친구와<br>이제<br>안녕</h1>
+    <p class="intro-lead">우리는 그날이 마지막인줄 모르고 헤어졌다.</p>
+    <p>마지막으로 놀았던 모래놀이터, 일명 내 동네에선 뱃놀이터라고 불리던 장소는 수년이 흐른 지금, 인공구조물과 포장바닥으로 뒤덮였다. 우리의 기억들은 탄성바닥 밑에 한숨쉰다.</p>
+    <p class="project-description">&lt;모래랑 친구와 이제 안녕&gt;은 사라져 가는 모래놀이터의 풍경과 감각적 기억을 인터랙티브 웹으로 재구성하는 프로젝트다. 사용자는 화면 속 입자를
+      움직이고 흩트리며, 손으로 만질 수 없는 디지털 공간에서 모래의 질감과 놀이의 흔적을 경험한다. 흩어진 입자는 저절로 돌아오지 않고, 그 위에 남은 기억은 사용자의 움직임에 따라 모습을 드러낸다.</p>
+  </aside>
+
+
+  <!-- ── 상단 모래놀이터 3종 PLY 미리보기 네비게이션 ── -->
+  <nav id="playground-nav" aria-label="모래놀이터 공간 선택">
+    <!-- 1. 기존 모래놀이터기구 -->
+    <button class="playground-btn active" id="btn-ply-0" onclick="놀이터모델선택(0)" aria-pressed="true" title="기존 모래놀이터기구">
+      <div class="playground-circle" id="circle-0">
+        <img id="playground-thumb-0" class="circle-thumb" alt="기존 모래놀이터기구 미리보기" />
+        <div class="circle-spinner" id="spinner-0">
+          <div class="spinner-ring"></div>
+        </div>
+      </div>
+      <span class="playground-label">기존 모래놀이터기구</span>
+    </button>
+
+    <!-- 2. 모래놀이터의 그네 -->
+    <button class="playground-btn" id="btn-ply-1" onclick="놀이터모델선택(1)" aria-pressed="false" title="모래놀이터의 그네">
+      <div class="playground-circle" id="circle-1">
+        <img id="playground-thumb-1" class="circle-thumb" alt="모래놀이터의 그네 미리보기" />
+        <div class="circle-spinner" id="spinner-1">
+          <div class="spinner-ring"></div>
+        </div>
+      </div>
+      <span class="playground-label">모래놀이터의 그네</span>
+    </button>
+
+    <!-- 3. 모래놀이장 -->
+    <button class="playground-btn" id="btn-ply-2" onclick="놀이터모델선택(2)" aria-pressed="false" title="모래놀이장">
+      <div class="playground-circle" id="circle-2">
+        <img id="playground-thumb-2" class="circle-thumb" alt="모래놀이장 미리보기" />
+        <div class="circle-spinner" id="spinner-2">
+          <div class="spinner-ring"></div>
+        </div>
+      </div>
+      <span class="playground-label">모래놀이장</span>
+    </button>
+  </nav>
+
+  <!-- 전환 알림 토스트 -->
+  <div id="toast-msg"></div>
+
+  <div id="webcam-wrapper">
+    <video id="webcam" autoplay muted playsinline></video>
+  </div>
+  <div id="ply-text-entry" contenteditable="true" role="textbox" aria-label="선택한 모래놀이터 문구 입력" spellcheck="false"></div>
+  <a id="hand-next-link" href="안녕.html" aria-label="다음 장면: 안녕"><img id="hand-art-source" src="손.png" alt=""
+      draggable="false"><canvas id="hand-art" width="512" height="512" aria-hidden="true"></canvas><img
+      id="hand-label-image" src="손 텍스트.png" alt="" draggable="false"><span class="friend-hold-progress"
+      aria-hidden="true"></span></a>
+
+  <!-- 두 손 모아 2초 리셋 프로그레스 UI -->
+  <div id="reset-indicator">
+    <svg class="progress-ring" width="120" height="120">
+      <circle stroke="rgba(200, 184, 154, 0.2)" stroke-width="6" fill="transparent" r="52" cx="60" cy="60" />
+      <circle id="reset-progress-circle" class="progress-ring__circle" stroke="#ffe6b4" stroke-width="6"
+        stroke-linecap="round" fill="transparent" r="52" cx="60" cy="60" />
+    </svg>
+    <div id="reset-text">🤲 두 손 모아 리셋 중<br><span id="reset-time">0.0s / 2.0s</span></div>
+  </div>
+
+  <div id="finger-radius-ring" aria-hidden="true"></div>
+  <div id="photo-hold-progress" class="circle-spinner" aria-hidden="true">
+    <div class="spinner-ring"></div>
+  </div>
+  <button id="music-toggle" type="button" aria-label="음악 끄기" aria-pressed="true">♫</button>
+  <div id="photo-reader" aria-hidden="true"><img id="photo-reader-image" alt="선택한 추억 사진"></div>
+
+  <div id="overlay">
+    <div id="status-msg"></div>
+    <div id="drop-zone">
+      PLY 파일을 여기로 끌어다 놓으세요<br>
+      <span style="font-size:0.8em;opacity:0.7">또는 클릭해서 파일 선택</span>
+    </div>
+    <input type="file" id="file-input" accept=".ply">
+  </div>
+
+  <div id="hint-webcam">웹캠은 https 또는 localhost에서만 켜져요</div>
+  <div id="hint-control">
+    🖐 <b>한 손 펼치고 이동</b> : 부드러운 회전 (멈추면 감속)<br>
+    ✊ <b>한 손 주먹</b> : 회전 정지 및 현재 각도 유지<br>
+    ☝️ <b>한 손가락</b> : 입자 사르르 퍼뜨리기<br>
+    🖐🖐 <b>두 손 펼치기</b> : 사방으로 영구 흩어짐 & 추억 사진 등장<br>
+    🤲 <b>두 손 모으기 (2초)</b> : 전체 초기화 (원래대로 복구)<br>
+    <span style="opacity:0.75;font-size:0.9em">🖱️ <b>마우스 드래그</b> : 부드러운 회전 (R키: 리셋)</span>
+  </div>
+  <div id="hand-status">
+    <div id="hand-dot"></div>
+    <span id="hand-label">준비 중…</span>
+  </div>
+
+
+
+  <!-- Three.js r128 + PLYLoader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
+
+  <script>
+    "use strict";
+
+    /* ══════════════════════════════════════════════════════════════
+       ★ 조정 변수 모음
+    ══════════════════════════════════════════════════════════════ */
+
+    // ── 점 구름 ──────────────────────────────────────────────────
+    let 점증폭배수 = 3;         // 정점(point) 개수 3배 증폭 생성
+    let 점크기 = 2.2;       // 점 픽셀 크기
+
+    // ── 스캔 보정 (Z축 -90도 회전 적용하여 바로 세우기) ──────
+    let 스캔크기 = 1.0;       // 1.0 = 자동 크기 맞춤
+    let 스캔회전X = Math.PI;   // X축 180도 뒤집기
+    let 스캔회전Y = Math.PI / 2; // Y축 +90도
+    let 스캔회전Z = -Math.PI / 2; // Z축 -90도 회전
+
+    // ── 인터랙션 & 물리 감속 ────────────────────────────────────
+    let 두손흩어지는힘 = 12.0;      // 두 손 펼쳤을 때 사방으로 완전히 날아가는 거리
+    let 복원속도 = 0.06;      // 리셋 시 원래 위치로 복원되는 속도
+    let 손회전감도 = 0.65;      // 한 손 손바닥 이동에 따른 회전 가속 감도
+    let 마우스회전감도 = 0.0022;    // 마우스 드래그 회전 감도
+    let 관성감속비율 = 0.91;      // 손/마우스를 멈췄을 때 부드러운 감속 계수 (0~1)
+
+    // ── 웹캠 ─────────────────────────────────────────────────────
+    let 웹캠크기비율 = 0.22;      // 화면 대비 웹캠 크기
+    let 웹캠투명도 = 0.70;
+    let 웹캠흑백 = true;
+
+    /* ══════════════════════════════════════════════════════════════
+       전역 변수
+    ══════════════════════════════════════════════════════════════ */
+
+    let 장면, 카메라, 렌더러;
+    let 점구름 = null;
+    let 점수 = 0;
+
+    // 위치 배열 (Float32Array)
+    let 원래위치 = null;
+    let 현재위치 = null;
+    let 날아갈방향 = null;
+
+    // MediaPipe 손 인식
+    let handLandmarker = null;
+    let 이전손X = null, 이전손Y = null;
+
+    // 회전 속도 (Physics Momentum)
+    let 회전속도X = 0, 회전속도Y = 0;
+
+    // 흩어짐 강도 제어 (0 = 원래 모양, 3.0 = 영구 폭발)
+    let 현재흩어짐강도 = 0;
+    let 목표흩어짐강도 = 0;
+    let 두손영구고정 = false;     // 전체 리셋 전까지 영구 유지
+    let 두손트리거락 = false;     // 중복 실행 방지 락
+    let 두손펼침누적시간 = 0;       // 양손 펼침 안정화 시간 확인 (0.35초)
+
+    // 한 손가락 제스처: 가까운 일부 입자만 아래로 흐르게 하는 상태
+    const 한손가락반경월드 = 0.24;
+    const 모래낙하최대월드 = 2.0;
+    let 한손가락흐름활성 = false;
+    let 한손가락흐름중심 = null;
+    let 한손가락흐름이전중심 = null;
+    let 한손가락흐름이전중심유효 = false;
+    let 한손가락흐름이번프레임갱신됨 = false;
+    let 한손가락흐름오프셋 = null;
+    let 한손가락흐름속도 = null;
+    let 손가락광선추적기 = null;
+    let 손가락평면 = null;
+    let 손가락교차점 = null;
+    let 손가락도트월드위치 = null;
+    let 손가락표시도트 = null;
+    let 손가락유지대상키 = null;
+    let 손가락유지대상요소 = null;
+    let 손가락유지프로그레스요소 = null;
+    let 손가락유지누적초 = 0;
+    let 손가락유지실행됨 = false;
+    let 손가락NDC = null;
+    let 이전한손주먹상태 = false;
+    // ── 기억 사진들 (test1.jpg ~ test9.jpg) ──────────────────────
+    let 사진그룹 = null;
+    let 사진스프라이트들 = [];
+    let 사진리더스프라이트 = null;
+    let 사진선택월드좌표 = null;
+    let 사진선택화면좌표 = null;
+    let 사진마우스호버 = null;
+    let 사진손가락호버 = null;
+    const 사진파일목록 = [
+      'test1.jpg', 'test2.jpg', 'test3.jpg',
+      'test4.jpg', 'test5.jpg', 'test6.jpg',
+      'test7.jpg', 'test8.jpg', 'test9.jpg'
+    ];
+
+    // 전체 리셋 제스처 (두 손 모으기 2초 유지)
+    let 리셋누적시간 = 0;
+    let 리셋쿨다운 = 0;         // 리셋 직후 오작동 방지 (초 단위)
+
+    // 마우스 인터랙션
+    let 마우스누름 = false;
+    let 마우스드래그됨 = false;
+    let 마우스시작X = 0, 마우스시작Y = 0;
+    let 마우스클릭대상허용 = false;
+    let 마우스이전X = 0, 마우스이전Y = 0;
+    let 마우스화면X = 0, 마우스화면Y = 0;
+
+    // 타이밍
+    let 이전시간 = 0;
+
+    /* ══════════════════════════════════════════════════════════════
+       진입점
+    ══════════════════════════════════════════════════════════════ */
+    let 페이지배경음 = null;
+    let 모래흐름음 = null;
+    let 효과음파일 = {};
+    let 재생중효과음 = new Set();
+    let 음악켜짐 = true;
+    let 환경사운드시작됨 = false;
+    let 기억사운드타이머들 = [];
+
+    function 페이지사운드초기화() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('audioOn')) 음악켜짐 = params.get('audioOn') !== '0';
+      const 재개초 = Number(params.get('audioTime'));
+
+      페이지배경음 = new Audio('backgroundsong.mp3');
+      페이지배경음.loop = true;
+      페이지배경음.volume = 0.38;
+      페이지배경음.preload = 'auto';
+      if (Number.isFinite(재개초) && 재개초 > 0) {
+        const 재개위치설정 = function () {
+          if (페이지배경음.duration > 0) 페이지배경음.currentTime = 재개초 % 페이지배경음.duration;
+          else 페이지배경음.currentTime = 재개초;
+        };
+        페이지배경음.addEventListener('loadedmetadata', 재개위치설정, { once: true });
+        if (페이지배경음.readyState >= 1) 재개위치설정();
+      }
+
+      모래흐름음 = new Audio('sand1.mp3');
+      모래흐름음.loop = true;
+      모래흐름음.volume = 0.95;
+      모래흐름음.preload = 'auto';
+
+      ['btn', 'mbk', 'bird', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6', 'mend'].forEach(function (이름) {
+        효과음파일[이름] = new Audio(이름 + '.mp3');
+        효과음파일[이름].preload = 'auto';
+      });
+
+      const 음악버튼 = document.getElementById('music-toggle');
+      if (음악버튼) {
+        음악버튼.addEventListener('click', function () {
+          음악켜짐 = !음악켜짐;
+          음악버튼화면갱신();
+          if (음악켜짐) 오디오사용자활성화();
+          else 오디오모두정지();
+        });
+        음악버튼화면갱신();
+      }
+
+      const 다음페이지링크 = document.getElementById('hand-next-link');
+      if (다음페이지링크) {
+        다음페이지링크.addEventListener('click', function (event) {
+          event.preventDefault();
+          window.location.href = 오디오상태포함주소(다음페이지링크.href);
+        });
+      }
+
+      document.addEventListener('pointerdown', 오디오사용자활성화, { passive: true });
+      document.addEventListener('keydown', 오디오사용자활성화);
+      document.addEventListener('click', function (event) {
+        오디오사용자활성화();
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const 음악버튼클릭 = target.closest('#music-toggle');
+        const 누른버튼 = target.closest('button, a, [role="button"]');
+        const 사진바깥닫기 = target.id === 'photo-reader';
+        if (!음악버튼클릭 && (누른버튼 || 사진바깥닫기)) 오디오효과재생('btn', 0.62);
+      }, true);
+
+      if (params.get('resumeAudio') === '1' && 음악켜짐) 오디오사용자활성화();
+    }
+
+    function 음악버튼화면갱신() {
+      const button = document.getElementById('music-toggle');
+      if (!button) return;
+      button.textContent = '♫';
+      button.classList.toggle('is-muted', !음악켜짐);
+      button.setAttribute('aria-pressed', 음악켜짐 ? 'true' : 'false');
+      button.setAttribute('aria-label', 음악켜짐 ? '음악 끄기' : '음악 켜기');
+    }
+
+    function 오디오상태포함주소(targetUrl) {
+      const url = new URL(targetUrl, window.location.href);
+      url.searchParams.set('audioOn', 음악켜짐 ? '1' : '0');
+      url.searchParams.set('audioTime', 페이지배경음 ? String(페이지배경음.currentTime || 0) : '0');
+      url.searchParams.set('resumeAudio', '1');
+      return url.href;
+    }
+
+    function 오디오모두정지() {
+      if (페이지배경음) 페이지배경음.pause();
+      if (모래흐름음) 모래흐름음.pause();
+      재생중효과음.forEach(function (sound) {
+        sound.pause();
+        sound.currentTime = 0;
+      });
+      재생중효과음.clear();
+    }
+
+    function 오디오사용자활성화() {
+      if (!음악켜짐) return;
+      if (페이지배경음 && 페이지배경음.paused) {
+        페이지배경음.play().catch(function () { });
+      }
+      if (환경사운드시작됨) return;
+      환경사운드시작됨 = true;
+      환경사운드예약('mbk', 12000, 31000, 0.34);
+      환경사운드예약('bird', 20000, 47000, 0.4);
+    }
+
+    function 환경사운드예약(이름, 최소간격, 최대간격, 볼륨) {
+      setTimeout(function () {
+        오디오효과재생(이름, 볼륨);
+        환경사운드예약(이름, 최소간격, 최대간격, 볼륨);
+      }, 최소간격 + Math.random() * (최대간격 - 최소간격));
+    }
+
+    function 오디오효과재생(이름, 볼륨) {
+      if (!음악켜짐) return;
+      const 원본 = 효과음파일[이름];
+      if (!원본) return;
+      const 효과음 = 원본.cloneNode();
+      효과음.volume = 볼륨 === undefined ? 0.7 : 볼륨;
+      효과음.currentTime = 0;
+      재생중효과음.add(효과음);
+      효과음.addEventListener('ended', function () { 재생중효과음.delete(효과음); }, { once: true });
+      효과음.play().catch(function () { 재생중효과음.delete(효과음); });
+    }
+
+    function 모래흐름사운드동기화(재생필요) {
+      if (!모래흐름음) return;
+      if (재생필요 && 음악켜짐) {
+        if (모래흐름음.paused) {
+          모래흐름음.currentTime = 0;
+          모래흐름음.play().catch(function () { });
+        }
+      } else if (!모래흐름음.paused) {
+        모래흐름음.pause();
+        모래흐름음.currentTime = 0;
+      }
+    }
+
+    function 기억사운드랜덤재생() {
+      기억사운드예약취소();
+      const 순서 = ['m1', 'm2', 'm4', 'mend', 'm3', 'm5', 'm6'];
+      for (let i = 순서.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [순서[i], 순서[j]] = [순서[j], 순서[i]];
+      }
+
+      let 누적초 = 1.2 + Math.random() * 3.8;
+      순서.forEach(function (이름) {
+        const 예약 = setTimeout(function () {
+          const 볼륨 = (['m3', 'mend', 'm5', 'm6'].includes(이름)) ? 0.25 : 0.72;
+          오디오효과재생(이름, 볼륨);
+        }, 누적초 * 1000);
+        기억사운드타이머들.push(예약);
+        누적초 += 2.0 + Math.random() * 5.5;
+      });
+    }
+
+    function 기억사운드예약취소() {
+      기억사운드타이머들.forEach(clearTimeout);
+      기억사운드타이머들 = [];
+    }
+    window.addEventListener('load', function () {
+      페이지사운드초기화();
+      Three장면초기화();
+      마우스이벤트연결();
+      키보드이벤트연결();
+      드래그드롭이벤트연결();
+      웹캠시작();
+      놀이터네비게이션초기화();
+      사진리더초기화();
+      requestAnimationFrame(애니메이션루프);
+    });
+
+    /* ──────────────────────────────────────────────────────────────
+       Three.js 장면 초기화
+    ────────────────────────────────────────────────────────────── */
+    function Three장면초기화() {
+      장면 = new THREE.Scene();
+      손가락표시도트 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.035, 12, 8),
+        new THREE.MeshBasicMaterial({ color: 0xfff4dd, depthTest: false, depthWrite: false })
+      );
+      손가락표시도트.visible = false;
+      손가락표시도트.renderOrder = 100;
+      장면.add(손가락표시도트);
+      카메라 = new THREE.PerspectiveCamera(
+        60, window.innerWidth / window.innerHeight, 0.01, 1000
+      );
+      카메라.position.set(0, 0, 5);
+      사진선택월드좌표 = new THREE.Vector3();
+      사진선택화면좌표 = new THREE.Vector3();
+      손가락광선추적기 = new THREE.Raycaster();
+      손가락평면 = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      손가락교차점 = new THREE.Vector3();
+      손가락도트월드위치 = new THREE.Vector3();
+      손가락NDC = new THREE.Vector2();
+      한손가락흐름중심 = new THREE.Vector3();
+      한손가락흐름이전중심 = new THREE.Vector3();
+      한손가락흐름이전중심유효 = false;
+
+      렌더러 = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      렌더러.setSize(window.innerWidth, window.innerHeight);
+      렌더러.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      렌더러.setClearColor(0x000000, 0);
+      document.body.appendChild(렌더러.domElement);
+
+      let cv = 렌더러.domElement;
+      cv.style.position = 'fixed';
+      cv.style.top = '0';
+      cv.style.left = '0';
+      cv.style.zIndex = '2';
+      cv.style.pointerEvents = 'none';
+
+      window.addEventListener('resize', function () {
+        카메라.aspect = window.innerWidth / window.innerHeight;
+        카메라.updateProjectionMatrix();
+        렌더러.setSize(window.innerWidth, window.innerHeight);
+        웹캠크기조절();
+      });
+
+      기억사진들초기화();
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       ★ 3차원 가상 기억 사진들 (test1.jpg ~ test9.jpg)
+       - 3차원 가상 공간 속 랜덤 위치에 배치
+       - 평소에는 숨겨져 있다가(opacity: 0)
+       - PLY가 완전히 흩어졌을 때 공간 속에 부드럽게 떠오름!
+    ────────────────────────────────────────────────────────────── */
+    function 기억사진들초기화() {
+      사진그룹 = new THREE.Group();
+      장면.add(사진그룹);
+
+      let textureLoader = new THREE.TextureLoader();
+
+      사진파일목록.forEach(function (파일명, idx) {
+        textureLoader.load(
+          파일명,
+          function (texture) {
+            let mat = new THREE.SpriteMaterial({
+              map: texture,
+              transparent: true,
+              opacity: 0.0, // 완전히 흩어지기 전까지는 숨김
+              depthWrite: false
+            });
+
+            let sprite = new THREE.Sprite(mat);
+            sprite.userData.파일명 = 파일명;
+
+            // 3차원 공간 속 랜덤 위치 계산
+            // 나를 둘러싼 360도 원형 둘레 (반경 2.8 ~ 4.2, 높이 -1.4 ~ +1.4)
+            let 기본각도 = (idx / 사진파일목록.length) * Math.PI * 2;
+            let 각도랜덤 = 기본각도 + (Math.random() - 0.5) * 0.45;
+            let 거리랜덤 = 2.8 + Math.random() * 1.5;
+            let 높이랜덤 = ((idx % 3) - 1) * 1.1 + (Math.random() - 0.5) * 0.6;
+
+            let x = Math.cos(각도랜덤) * 거리랜덤;
+            let y = 높이랜덤;
+            let z = Math.sin(각도랜덤) * 거리랜덤;
+
+            sprite.position.set(x, y, z);
+            sprite.userData.기본Y = y;
+            sprite.userData.진동위상 = idx * 1.25 + Math.random();
+
+            // 사진 비율 크기 (가로 1.4, 세로 1.05)
+            sprite.scale.set(1.4, 1.05, 1.0);
+            sprite.userData.기본크기X = 1.4;
+            sprite.userData.기본크기Y = 1.05;
+
+            사진그룹.add(sprite);
+            사진스프라이트들.push(sprite);
+          },
+          undefined,
+          function (err) {
+            console.warn('사진 로드 실패:', 파일명, err);
+          }
+        );
+      });
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       ★ 기억 사진들 페이드인/아웃 & 부유 애니메이션
+    ────────────────────────────────────────────────────────────── */
+    function 기억사진업데이트(현재시간) {
+      if (!사진그룹) return;
+
+      if (점구름) {
+        사진그룹.rotation.copy(점구름.rotation);
+      }
+
+      let 목표투명도 = (두손영구고정 && 현재흩어짐강도 > 2.0) ? 0.95 : 0.0;
+
+      for (let i = 0; i < 사진스프라이트들.length; i++) {
+        let sprite = 사진스프라이트들[i];
+        let mat = sprite.material;
+        const 호버중 = sprite === 사진마우스호버 || sprite === 사진손가락호버;
+        const 크기배수 = 호버중 ? 1.1 : 1.0;
+        const 목표너비 = (sprite.userData.기본크기X || 1.4) * 크기배수;
+        const 목표높이 = (sprite.userData.기본크기Y || 1.05) * 크기배수;
+        sprite.scale.x += (목표너비 - sprite.scale.x) * 0.18;
+        sprite.scale.y += (목표높이 - sprite.scale.y) * 0.18;
+        mat.opacity += (목표투명도 - mat.opacity) * 0.045;
+
+        if (mat.opacity > 0.01) {
+          let phase = sprite.userData.진동위상 || 0;
+          sprite.position.y = sprite.userData.기본Y + Math.sin(현재시간 * 0.0016 + phase) * 0.08;
+        }
+        sprite.userData.화면영역 = null;
+      }
+
+      if (!카메라 || !사진선택월드좌표 || !사진선택화면좌표) return;
+      사진그룹.updateMatrixWorld(true);
+      카메라.updateMatrixWorld(true);
+      const 시야각라디안 = THREE.MathUtils.degToRad(카메라.fov);
+
+      for (let i = 0; i < 사진스프라이트들.length; i++) {
+        const sprite = 사진스프라이트들[i];
+        if (!sprite.material || sprite.material.opacity <= 0.55) continue;
+
+        사진선택월드좌표.setFromMatrixPosition(sprite.matrixWorld);
+        사진선택화면좌표.copy(사진선택월드좌표).project(카메라);
+        if (사진선택화면좌표.z < -1 || 사진선택화면좌표.z > 1) continue;
+
+        const 깊이 = Math.max(0.1, 카메라.position.distanceTo(사진선택월드좌표));
+        const 보이는높이 = 2 * 깊이 * Math.tan(시야각라디안);
+        sprite.userData.화면영역 = {
+          중심X: (사진선택화면좌표.x + 1) * 0.5 * window.innerWidth,
+          중심Y: (1 - 사진선택화면좌표.y) * 0.5 * window.innerHeight,
+          반너비: (sprite.scale.x / 보이는높이 * window.innerHeight) * 0.5,
+          반높이: (sprite.scale.y / 보이는높이 * window.innerHeight) * 0.5,
+          깊이: 깊이
+        };
+      }
+    }
+    /* ──────────────────────────────────────────────────────────────
+       ★ 3종 모래놀이터 PLY 관리 및 미리보기 시스템
+       1. sandplayground1 (sandplayground.ply) — 기존 모래놀이터기구
+       2. sandplayground2 (sandplayground2.ply) — 모래놀이터의 그네
+       3. sandplayground3 (sandplayground3.ply) — 모래놀이장
+    ────────────────────────────────────────────────────────────── */
+    const 놀이터목록 = [
+      {
+        id: 'sandplayground1',
+        파일명: 'sandplayground_25pct.ply',
+        대체파일명: 'sandplayground1_25pct.ply',
+        이름: '기존 모래놀이터기구',
+        부제목: 'sandplayground1',
+        설명: '미끄럼틀 & 조합놀이대'
+      },
+      {
+        id: 'sandplayground2',
+        파일명: 'sandplayground2_25pct.ply',
+        대체파일명: null,
+        이름: '모래놀이터의 그네',
+        부제목: 'sandplayground2',
+        설명: '추억의 쇠사슬 그네'
+      },
+      {
+        id: 'sandplayground3',
+        파일명: 'sandplayground3_25pct.ply',
+        대체파일명: null,
+        이름: '모래놀이장',
+        부제목: 'sandplayground3',
+        설명: '사라져가는 모래마당'
+      }
+    ];
+
+    let 지오메트리캐시 = [null, null, null];
+    let 썸네일생성여부 = [false, false, false];
+    let 현재놀이터인덱스 = 0;
+
+    const PLY기본문구 = '씨알공원에 있는 모래놀이터이다. 정기소독을 거친 모래는 아이들이 창의적이게 노는 공간으로 남겨진다';
+    const PLY별텍스트내용 = [PLY기본문구, PLY기본문구, PLY기본문구];
+
+    function PLY텍스트칸선택(인덱스) {
+      const editor = document.getElementById('ply-text-entry');
+      if (!editor) return;
+      if (!editor.dataset.editBound) {
+        editor.addEventListener('input', function () {
+          const plyIndex = Number(editor.dataset.plyIndex);
+          PLY별텍스트내용[plyIndex] = editor.innerText;
+        });
+        editor.addEventListener('keydown', function (event) { event.stopPropagation(); });
+        editor.dataset.editBound = 'true';
+      }
+      editor.dataset.plyIndex = String(인덱스);
+      editor.textContent = PLY별텍스트내용[인덱스];
+      editor.classList.add('is-visible');
+    } function 놀이터네비게이션초기화() {
+      놀이터모델선택(0, true);
+    }
+
+    function 놀이터모델선택(인덱스, 초기호출) {
+      if (인덱스 < 0 || 인덱스 >= 놀이터목록.length) return;
+
+      // 이미 선택된 상태에서 다시 클릭 시 회전/흩어짐 초기화
+      if (!초기호출 && 인덱스 === 현재놀이터인덱스 && 점구름) {
+        전체리셋실행();
+
+        return;
+      }
+
+      현재놀이터인덱스 = 인덱스;
+      UI업데이트();
+      PLY텍스트칸선택(인덱스);
+
+      let item = 놀이터목록[인덱스];
+
+      // 1. 이미 지오메트리가 캐시되어 있으면 즉각 전환 (초고속)
+      if (지오메트리캐시[인덱스]) {
+        전체리셋실행();
+        PLY점구름만들기(지오메트리캐시[인덱스].clone());
+
+        return;
+      }
+
+      // 2. 캐시가 없으면 파일에서 로드
+      모델로딩표시(인덱스, true);
+
+      let loader = new THREE.PLYLoader();
+      let 파일후보 = [item.파일명];
+      if (item.대체파일명) 파일후보.push(item.대체파일명);
+      let 후보Idx = 0;
+
+      function 시도(fIdx) {
+        if (fIdx >= 파일후보.length) {
+          상태메시지('⚠ ' + item.이름 + ' 파일을 찾을 수 없어요.\n파일을 끌어다 놓거나 확인해 주세요.');
+          모델로딩표시(인덱스, false);
+          document.getElementById('drop-zone').style.display = 'block';
+          return;
+        }
+
+        let url = 파일후보[fIdx];
+        loader.load(
+          url,
+          function (geometry) {
+            지오메트리캐시[인덱스] = geometry;
+            모델로딩표시(인덱스, false);
+            상태메시지('');
+
+            전체리셋실행();
+            PLY점구름만들기(geometry.clone());
+
+            if (!썸네일생성여부[인덱스]) {
+              썸네일용미니점구름생성(geometry, 인덱스);
+            }
+
+
+            console.log('PLY 로드 성공:', url);
+
+            // 첫 모델이 로드되면 백그라운드에서 나머지 모델들도 미리 로드하여 썸네일 생성 및 캐싱
+            setTimeout(function () {
+              배경모델사전로드(0);
+            }, 500);
+          },
+          function () { },
+          function (err) {
+            console.warn(url + ' 로드 실패, 대체 후보 시도:', err);
+            시도(fIdx + 1);
+          }
+        );
+      }
+
+      시도(0);
+    }
+
+    // 백그라운드에서 남은 2개 모델을 사전 로드하여 썸네일 생성 & 캐시
+    function 배경모델사전로드(인덱스) {
+      if (인덱스 >= 놀이터목록.length) return;
+      if (지오메트리캐시[인덱스]) {
+        배경모델사전로드(인덱스 + 1);
+        return;
+      }
+
+      let item = 놀이터목록[인덱스];
+      let loader = new THREE.PLYLoader();
+      let 파일후보 = [item.파일명];
+      if (item.대체파일명) 파일후보.push(item.대체파일명);
+      let fIdx = 0;
+
+      function 시도() {
+        if (fIdx >= 파일후보.length) {
+          배경모델사전로드(인덱스 + 1);
+          return;
+        }
+        loader.load(
+          파일후보[fIdx],
+          function (geometry) {
+            지오메트리캐시[인덱스] = geometry;
+            썸네일용미니점구름생성(geometry, 인덱스);
+            console.log('백그라운드 사전 로드 완료:', item.이름);
+            setTimeout(function () {
+              배경모델사전로드(인덱스 + 1);
+            }, 400);
+          },
+          undefined,
+          function () {
+            fIdx++;
+            시도();
+          }
+        );
+      }
+      시도();
+    }
+
+    // 썸네일 전용 미니 점구름 생성 (경량화하여 즉시 렌더링)
+    function 썸네일용미니점구름생성(rawGeo, 인덱스) {
+      if (썸네일생성여부[인덱스]) return;
+      try {
+        let clone = rawGeo.clone();
+
+        // 중심 정렬
+        clone.computeBoundingBox();
+        let center = new THREE.Vector3();
+        clone.boundingBox.getCenter(center);
+
+        let pos = clone.getAttribute('position');
+        for (let i = 0; i < pos.count; i++) {
+          pos.setXYZ(i,
+            pos.getX(i) - center.x,
+            pos.getY(i) - center.y,
+            pos.getZ(i) - center.z
+          );
+        }
+        pos.needsUpdate = true;
+
+        // 회전 보정 (Z축 -90도, X/Y 보정)
+        clone.rotateX(스캔회전X);
+        clone.rotateY(스캔회전Y);
+        clone.rotateZ(스캔회전Z);
+
+        clone.computeBoundingBox();
+        let size = new THREE.Vector3();
+        clone.boundingBox.getSize(size);
+        let 최대변 = Math.max(size.x, size.y, size.z);
+        let scale = (스캔크기 === 1.0) ? (4.6 / 최대변) : 스캔크기;
+
+        스냅샷렌더링(clone, scale, 인덱스);
+        clone.dispose();
+      } catch (err) {
+        console.warn('썸네일 생성 실패:', err);
+      }
+    }
+
+    // 노란색 원 내부의 3D 입자 스냅샷 렌더링
+    function 스냅샷렌더링(geo, scale, 인덱스) {
+      let img = document.getElementById('playground-thumb-' + 인덱스);
+      if (!img) return;
+
+      try {
+        let w = 160, h = 160;
+        let canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+
+        let r = new THREE.WebGLRenderer({
+          canvas: canvas,
+          alpha: true,
+          antialias: true,
+          preserveDrawingBuffer: true
+        });
+        r.setSize(w, h);
+        r.setClearColor(0x000000, 0);
+
+        let sc = new THREE.Scene();
+        let cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+        cam.position.set(0, 0.35, 5.2);
+
+        let mat = new THREE.PointsMaterial({
+          size: 2.2,
+          vertexColors: true,
+          sizeAttenuation: false
+        });
+
+        let pts = new THREE.Points(geo, mat);
+        pts.scale.setScalar(scale * 0.95);
+        pts.position.y = 인덱스 === 2 ? -0.35 : 0;
+        pts.rotation.set(0.18, 0.45, 0); // 우아한 3D 입체 각도
+
+        sc.add(pts);
+        cam.lookAt(0, 0, 0);
+        r.render(sc, cam);
+
+        let dataUrl = canvas.toDataURL('image/png');
+        img.src = dataUrl;
+        img.style.opacity = '1';
+        썸네일생성여부[인덱스] = true;
+
+        sc.remove(pts);
+        mat.dispose();
+        r.dispose();
+      } catch (err) {
+        console.warn('스냅샷 렌더링 실패:', err);
+      }
+    }
+
+    function UI업데이트() {
+      for (let i = 0; i < 놀이터목록.length; i++) {
+        let btn = document.getElementById('btn-ply-' + i);
+        if (btn) {
+          if (i === 현재놀이터인덱스) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+          } else {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
+          }
+        }
+      }
+    }
+
+    function 모델로딩표시(인덱스, 로딩중) {
+      let spinner = document.getElementById('spinner-' + 인덱스);
+      if (!spinner) return;
+      if (로딩중) {
+        spinner.classList.add('show', 'loading');
+        spinner.classList.remove('holding');
+      } else {
+        spinner.classList.remove('show', 'loading');
+      }
+    }
+    function 손가락버튼유지초기화() {
+      if (손가락유지프로그레스요소) {
+        손가락유지프로그레스요소.classList.remove('holding');
+        손가락유지프로그레스요소.style.removeProperty('--hold-progress');
+        if (손가락유지프로그레스요소.classList.contains('circle-spinner') &&
+          !손가락유지프로그레스요소.classList.contains('loading')) {
+          손가락유지프로그레스요소.classList.remove('show');
+        }
+      }
+      if (손가락유지대상요소 && 손가락유지대상요소.id === 'hand-next-link') {
+        손가락유지대상요소.classList.remove('holding');
+        손가락유지대상요소.style.removeProperty('--hold-progress');
+      }
+      손가락유지대상키 = null;
+      손가락유지대상요소 = null;
+      손가락유지프로그레스요소 = null;
+      손가락유지누적초 = 0;
+      손가락유지실행됨 = false;
+    }
+
+    function 사진리더초기화() {
+      const reader = document.getElementById('photo-reader');
+      const image = document.getElementById('photo-reader-image');
+      if (!reader || !image) return;
+      reader.addEventListener('click', function (event) {
+        if (event.target === reader) 사진리더닫기();
+      });
+      image.addEventListener('click', function (event) { event.stopPropagation(); });
+      window.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') 사진리더닫기();
+      });
+    }
+
+    function 사진리더열기(sprite) {
+      오디오효과재생('btn', 0.62);
+      if (!sprite || !sprite.userData.파일명) return;
+      const reader = document.getElementById('photo-reader');
+      const image = document.getElementById('photo-reader-image');
+      if (!reader || !image) return;
+      사진리더스프라이트 = sprite;
+      image.src = sprite.userData.파일명;
+      reader.classList.add('is-open');
+      reader.setAttribute('aria-hidden', 'false');
+    }
+
+    function 사진리더닫기() {
+      const reader = document.getElementById('photo-reader');
+      const image = document.getElementById('photo-reader-image');
+      if (reader) {
+        reader.classList.remove('is-open');
+        reader.setAttribute('aria-hidden', 'true');
+      }
+      if (image) image.removeAttribute('src');
+      사진리더스프라이트 = null;
+    }
+
+    function 기억사진선택(화면X, 화면Y) {
+      if (!사진그룹 || !카메라 || !두손영구고정) return null;
+      const reader = document.getElementById('photo-reader');
+      if (reader && reader.classList.contains('is-open')) return null;
+
+      let 가장가까운사진 = null;
+      let 가장가까운거리 = Infinity;
+      let 현재유지사진 = false;
+
+      for (let i = 0; i < 사진스프라이트들.length; i++) {
+        const sprite = 사진스프라이트들[i];
+        const 영역 = sprite.userData.화면영역;
+        if (!영역 || sprite.material.opacity <= 0.55) continue;
+
+        const 대상키 = 'memory-photo-' + i;
+        const 현재유지중 = 손가락유지대상키 === 대상키;
+        const 여유 = 현재유지중 ? 58 : 26;
+        const 안에있음 = Math.abs(화면X - 영역.중심X) <= 영역.반너비 + 여유 &&
+          Math.abs(화면Y - 영역.중심Y) <= 영역.반높이 + 여유;
+        if (!안에있음) continue;
+
+        if ((현재유지중 && !현재유지사진) ||
+          (현재유지중 === 현재유지사진 && 영역.깊이 < 가장가까운거리)) {
+          가장가까운사진 = sprite;
+          가장가까운거리 = 영역.깊이;
+          현재유지사진 = 현재유지중;
+        }
+      }
+      return 가장가까운사진;
+    }
+    function 손가락버튼유지업데이트(화면X, 화면Y, delta) {
+      const photoReader = document.getElementById('photo-reader');
+      if (photoReader && photoReader.classList.contains('is-open')) {
+        손가락버튼유지초기화();
+        return;
+      }
+      let 대상 = null;
+      for (let i = 0; i < 3; i++) {
+        let 버튼 = document.getElementById('btn-ply-' + i);
+        if (!버튼) continue;
+        let rect = 버튼.getBoundingClientRect();
+        if (화면X >= rect.left && 화면X <= rect.right && 화면Y >= rect.top && 화면Y <= rect.bottom) {
+          let spinner = document.getElementById('spinner-' + i);
+          if (spinner && spinner.classList.contains('loading')) break;
+          대상 = { key: 'playground-' + i, element: 버튼, progress: spinner, action: function () { 오디오효과재생('btn', 0.62); 놀이터모델선택(i); } };
+          break;
+        }
+      }
+
+      if (!대상) {
+        let friendButton = document.getElementById('hand-next-link');
+        if (friendButton && !friendButton.classList.contains('is-scattered-hidden')) {
+          let rect = friendButton.getBoundingClientRect();
+          if (화면X >= rect.left && 화면X <= rect.right && 화면Y >= rect.top && 화면Y <= rect.bottom) {
+            대상 = { key: 'friend-next', element: friendButton, progress: friendButton, action: function () { friendButton.click(); } };
+          }
+        }
+      }
+
+      if (!대상 && 두손영구고정) {
+        let 선택사진 = 기억사진선택(화면X, 화면Y);
+        사진손가락호버 = 선택사진;
+        if (선택사진) {
+          const progress = document.getElementById('photo-hold-progress');
+          if (progress) {
+            progress.style.left = 화면X + 'px';
+            progress.style.top = 화면Y + 'px';
+          }
+          대상 = {
+            key: 'memory-photo-' + 사진스프라이트들.indexOf(선택사진),
+            element: renderer.domElement,
+            progress: document.getElementById('photo-hold-progress'),
+            사진선택: true,
+            action: function () { 사진리더열기(선택사진); }
+          };
+        }
+      }
+
+      if (!대상) {
+        손가락버튼유지초기화();
+        return;
+      }
+
+      if (대상.key !== 손가락유지대상키) {
+        손가락버튼유지초기화();
+        손가락유지대상키 = 대상.key;
+        손가락유지대상요소 = 대상.element;
+        손가락유지프로그레스요소 = 대상.progress;
+      }
+      if (손가락유지실행됨) return;
+
+      손가락유지누적초 = Math.min(2, 손가락유지누적초 + Math.max(0, delta));
+      let 진행률 = Math.min(100, 손가락유지누적초 / 2 * 100);
+      if (대상.progress) {
+        대상.progress.classList.add('show', 'holding');
+        대상.progress.style.setProperty('--hold-progress', 진행률 + '%');
+      } else {
+        대상.element.classList.add('holding');
+        대상.element.style.setProperty('--hold-progress', 진행률 + '%');
+      }
+
+      if (손가락유지누적초 >= 2) {
+        손가락유지실행됨 = true;
+        대상.action();
+      }
+    }
+    const 손버튼캔버스 = document.getElementById('hand-art');
+    const 손원본이미지 = document.getElementById('hand-art-source');
+    const 손캔버스컨텍스트 = 손버튼캔버스.getContext('2d');
+    const 손샘플캔버스 = document.createElement('canvas');
+    const 손샘플컨텍스트 = 손샘플캔버스.getContext('2d');
+    let 손픽셀강도 = 0;
+    let 손픽셀시작강도 = 0;
+    let 손픽셀목표강도 = 0;
+    let 손픽셀시작시간 = 0;
+    let 손픽셀프레임중 = false;
+
+    function 손픽셀그리기(강도) {
+      if (!손원본이미지.complete || !손원본이미지.naturalWidth) return;
+      const rect = 손버튼캔버스.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const 비율 = Math.min(window.devicePixelRatio || 1, 2);
+      const 너비 = Math.max(1, Math.round(rect.width * 비율));
+      const 높이 = Math.max(1, Math.round(rect.height * 비율));
+      if (손버튼캔버스.width !== 너비) 손버튼캔버스.width = 너비;
+      if (손버튼캔버스.height !== 높이) 손버튼캔버스.height = 높이;
+
+      const 최대픽셀수 = Math.max(너비, 높이);
+      const 최소픽셀수 = Math.max(24, Math.round(최대픽셀수 / 30));
+      const 샘플너비 = Math.max(최소픽셀수, Math.round(최대픽셀수 - (최대픽셀수 - 최소픽셀수) * 강도));
+      const 샘플높이 = Math.max(1, Math.round(샘플너비 * 높이 / 너비));
+      if (손샘플캔버스.width !== 샘플너비) 손샘플캔버스.width = 샘플너비;
+      if (손샘플캔버스.height !== 샘플높이) 손샘플캔버스.height = 샘플높이;
+
+      손샘플컨텍스트.clearRect(0, 0, 샘플너비, 샘플높이);
+      손샘플컨텍스트.imageSmoothingEnabled = true;
+      손샘플컨텍스트.drawImage(손원본이미지, 0, 0, 샘플너비, 샘플높이);
+      손캔버스컨텍스트.clearRect(0, 0, 너비, 높이);
+      손캔버스컨텍스트.imageSmoothingEnabled = false;
+      손캔버스컨텍스트.drawImage(손샘플캔버스, 0, 0, 너비, 높이);
+    }
+
+    function 손픽셀강도설정(목표강도) {
+      손픽셀시작강도 = 손픽셀강도;
+      손픽셀목표강도 = 목표강도;
+      손픽셀시작시간 = performance.now();
+      if (!손픽셀프레임중) {
+        손픽셀프레임중 = true;
+        requestAnimationFrame(손픽셀프레임);
+      }
+    }
+
+    function 손픽셀프레임(현재시간) {
+      const 진행률 = Math.min(1, (현재시간 - 손픽셀시작시간) / 2000);
+      const 부드러운진행 = 진행률 * 진행률 * (3 - 2 * 진행률);
+      손픽셀강도 = 손픽셀시작강도 + (손픽셀목표강도 - 손픽셀시작강도) * 부드러운진행;
+      손픽셀그리기(손픽셀강도);
+      if (진행률 < 1) {
+        requestAnimationFrame(손픽셀프레임);
+      } else {
+        손픽셀강도 = 손픽셀목표강도;
+        손픽셀프레임중 = false;
+      }
+    }
+
+    const 손버튼링크 = document.getElementById('hand-next-link');
+    손버튼링크.addEventListener('pointerenter', function () { 손픽셀강도설정(1); });
+    손버튼링크.addEventListener('pointerleave', function () { 손픽셀강도설정(0); });
+    손버튼링크.addEventListener('focus', function () { 손픽셀강도설정(1); });
+    손버튼링크.addEventListener('blur', function () { 손픽셀강도설정(0); });
+    if (손원본이미지.complete) 손픽셀그리기(0);
+    else 손원본이미지.addEventListener('load', function () { 손픽셀그리기(0); }, { once: true });
+    window.addEventListener('resize', function () { 손픽셀그리기(손픽셀강도); });
+    let toastTimer = null;
+    document.getElementById('hand-next-link').addEventListener('click', 손페이지이동시작);
+    function 알림메시지표시(문구) {
+      let toast = document.getElementById('toast-msg');
+      if (!toast) return;
+      toast.innerText = 문구;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       ★ PLY 점 구름 생성 (Point 개수 3배 증폭 생성)
+    ────────────────────────────────────────────────────────────── */
+    function PLY점구름만들기(geometry) {
+      let posAttr = geometry.getAttribute('position');
+      let colorAttr = geometry.getAttribute('color');
+      let 원본점수 = posAttr.count;
+
+      // 원본 점 개수를 3배로 증폭
+      점수 = 원본점수 * 점증폭배수;
+
+      let 위치배열 = new Float32Array(점수 * 3);
+      let 색배열 = new Float32Array(점수 * 3);
+
+      // 미세 분산용 반경 계수
+      geometry.computeBoundingBox();
+      let bsize = new THREE.Vector3();
+      geometry.boundingBox.getSize(bsize);
+      let 지터반경 = Math.max(bsize.x, bsize.y, bsize.z) * 0.0035;
+
+      let targetIdx = 0;
+      for (let i = 0; i < 원본점수; i++) {
+        let ox = posAttr.getX(i);
+        let oy = posAttr.getY(i);
+        let oz = posAttr.getZ(i);
+
+        let cr = colorAttr ? colorAttr.getX(i) : 0.65;
+        let cg = colorAttr ? colorAttr.getY(i) : 0.45;
+        let cb = colorAttr ? colorAttr.getZ(i) : 0.25;
+
+        // 1번째 점: 원본 위치 그대로
+        위치배열[targetIdx * 3] = ox;
+        위치배열[targetIdx * 3 + 1] = oy;
+        위치배열[targetIdx * 3 + 2] = oz;
+        색배열[targetIdx * 3] = cr;
+        색배열[targetIdx * 3 + 1] = cg;
+        색배열[targetIdx * 3 + 2] = cb;
+        targetIdx++;
+
+        // 2번째 & 3번째 점: 미세 표면 지터링으로 3배 밀도 형성
+        for (let m = 1; m < 점증폭배수; m++) {
+          let jx = (Math.random() - 0.5) * 지터반경 * 2;
+          let jy = (Math.random() - 0.5) * 지터반경 * 2;
+          let jz = (Math.random() - 0.5) * 지터반경 * 2;
+
+          // 미세한 모래 색상 변조
+          let tone = 0.92 + Math.random() * 0.16;
+
+          위치배열[targetIdx * 3] = ox + jx;
+          위치배열[targetIdx * 3 + 1] = oy + jy;
+          위치배열[targetIdx * 3 + 2] = oz + jz;
+          색배열[targetIdx * 3] = Math.min(1, cr * tone);
+          색배열[targetIdx * 3 + 1] = Math.min(1, cg * tone);
+          색배열[targetIdx * 3 + 2] = Math.min(1, cb * tone);
+          targetIdx++;
+        }
+      }
+
+      let geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(위치배열, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(색배열, 3));
+
+      // 중심 정렬
+      geo.computeBoundingBox();
+      let center = new THREE.Vector3();
+      geo.boundingBox.getCenter(center);
+
+      let pos = geo.getAttribute('position');
+      for (let i = 0; i < pos.count; i++) {
+        pos.setXYZ(i,
+          pos.getX(i) - center.x,
+          pos.getY(i) - center.y,
+          pos.getZ(i) - center.z
+        );
+      }
+      pos.needsUpdate = true;
+
+      // 스캔 기본 각도 보정 (Z축 -90도)
+      geo.rotateX(스캔회전X);
+      geo.rotateY(스캔회전Y);
+      geo.rotateZ(스캔회전Z);
+
+      // 크기 맞춤
+      geo.computeBoundingBox();
+      let size = new THREE.Vector3();
+      geo.boundingBox.getSize(size);
+      let 최대변 = Math.max(size.x, size.y, size.z);
+      let 자동배율 = (스캔크기 === 1.0) ? (4.6 / 최대변) : 스캔크기;
+
+      let mat = new THREE.PointsMaterial({
+        size: 점크기,
+        vertexColors: true,
+        sizeAttenuation: false
+      });
+
+      if (점구름) {
+        장면.remove(점구름);
+        if (점구름.geometry) 점구름.geometry.dispose();
+        if (점구름.material) 점구름.material.dispose();
+        점구름 = null;
+      }
+      점구름 = new THREE.Points(geo, mat);
+      점구름.scale.setScalar(자동배율);
+      // 세 번째 PLY의 화면상 높이를 낮춰 중앙에 배치합니다.
+      점구름.position.y = 현재놀이터인덱스 === 2 ? -1 : 0;
+      장면.add(점구름);
+
+      // 현재 모델의 썸네일 생성 (아직 없는 경우)
+      if (현재놀이터인덱스 >= 0 && !썸네일생성여부[현재놀이터인덱스]) {
+        스냅샷렌더링(geo, 자동배율, 현재놀이터인덱스);
+      }
+
+      원래위치 = new Float32Array(점수 * 3);
+      현재위치 = new Float32Array(점수 * 3);
+      날아갈방향 = new Float32Array(점수 * 3);
+      한손가락흐름오프셋 = new Float32Array(점수 * 3);
+      한손가락흐름속도 = new Float32Array(점수 * 3);
+      한손가락흐름활성 = false;
+      이전한손주먹상태 = false;
+
+      let localPos = geo.getAttribute('position');
+      for (let i = 0; i < 점수; i++) {
+        let lx = localPos.getX(i);
+        let ly = localPos.getY(i);
+        let lz = localPos.getZ(i);
+
+        원래위치[i * 3] = lx;
+        원래위치[i * 3 + 1] = ly;
+        원래위치[i * 3 + 2] = lz;
+
+        현재위치[i * 3] = lx;
+        현재위치[i * 3 + 1] = ly;
+        현재위치[i * 3 + 2] = lz;
+
+        let dx = (Math.random() - 0.5) * 2;
+        let dy = (Math.random() - 0.5) * 2;
+        let dz = (Math.random() - 0.5) * 2;
+        let len = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+        날아갈방향[i * 3] = dx / len;
+        날아갈방향[i * 3 + 1] = dy / len;
+        날아갈방향[i * 3 + 2] = dz / len;
+      }
+
+      document.getElementById('status-msg').style.display = 'none';
+      document.getElementById('drop-zone').style.display = 'none';
+      document.getElementById('hint-control').style.display = 'block';
+
+      console.log(`점 구름 생성 완료: 원본 ${원본점수}개 → 3배 증폭 ${점수}개`);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       MediaPipe 초기화 (numHands: 2)
+    ────────────────────────────────────────────────────────────── */
+    async function MediaPipe초기화() {
+      try {
+        let mp = await import(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs'
+        );
+
+        let filesetResolver = await mp.FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
+        );
+
+        handLandmarker = await mp.HandLandmarker.createFromOptions(filesetResolver, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+            delegate: 'GPU'
+          },
+          runningMode: 'VIDEO',
+          numHands: 2
+        });
+
+        document.getElementById('hand-dot').className = 'ready';
+        document.getElementById('hand-label').innerText = '손 감지 준비됨';
+      } catch (e) {
+        console.warn('MediaPipe 로드 실패 → 마우스 모드로 작동:', e);
+        document.getElementById('hand-label').innerText = '마우스 모드';
+      }
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       손가락 상태 분석 헬퍼
+    ────────────────────────────────────────────────────────────── */
+    function 거리(p1, p2) {
+      let dx = p1.x - p2.x, dy = p1.y - p2.y, dz = (p1.z || 0) - (p2.z || 0);
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    function 손가락분석(lm) {
+      let 손목 = lm[0];
+      let 검지펴짐 = 거리(lm[8], 손목) > 거리(lm[6], 손목) * 1.15;
+      let 중지펴짐 = 거리(lm[12], 손목) > 거리(lm[10], 손목) * 1.15;
+      let 약지펴짐 = 거리(lm[16], 손목) > 거리(lm[14], 손목) * 1.15;
+      let 새끼펴짐 = 거리(lm[20], 손목) > 거리(lm[18], 손목) * 1.15;
+      let 엄지펴짐 = 거리(lm[4], lm[17]) > 거리(lm[2], lm[17]) * 1.15;
+
+      let 펴진손가락수 = (검지펴짐 ? 1 : 0) + (중지펴짐 ? 1 : 0) + (약지펴짐 ? 1 : 0) + (새끼펴짐 ? 1 : 0) + (엄지펴짐 ? 1 : 0);
+
+      let 한손가락만 = 검지펴짐 && !중지펴짐 && !약지펴짐 && !새끼펴짐;
+      let 활짝 = 펴진손가락수 >= 4;
+      let 주먹 = 펴진손가락수 <= 1 && !한손가락만;
+
+      return { 펴진손가락수, 활짝, 주먹, 한손가락만 };
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       ★ 전체 리셋 함수 (위치, 회전, 입자, 상태 초기화)
+    ────────────────────────────────────────────────────────────── */
+    function 전체리셋실행() {
+      모래흐름사운드동기화(false);
+      기억사운드예약취소();
+      let handLink = document.getElementById('hand-next-link');
+      if (handLink) handLink.classList.remove('is-scattered-hidden');
+      const filmStrip = document.getElementById('left-film-strip');
+      if (filmStrip) filmStrip.classList.remove('is-scattered-hidden');
+      사진리더닫기();
+      사진마우스호버 = null;
+      사진손가락호버 = null;
+      document.body.style.cursor = '';
+      두손영구고정 = false;
+      두손트리거락 = false;
+      두손펼침누적시간 = 0;
+      목표흩어짐강도 = 0.0;
+      현재흩어짐강도 = 0.0;
+      한손가락흐름활성 = false;
+      한손가락흐름이전중심유효 = false;
+      이전한손주먹상태 = false;
+      if (한손가락흐름오프셋) 한손가락흐름오프셋.fill(0);
+      if (한손가락흐름속도) 한손가락흐름속도.fill(0);
+
+      회전속도X = 0;
+      회전속도Y = 0;
+
+      if (점구름) {
+        점구름.rotation.set(0, 0, 0);
+      }
+
+      // 입자 위치 즉각 복원
+      if (원래위치 && 현재위치) {
+        for (let i = 0; i < 점수 * 3; i++) {
+          현재위치[i] = 원래위치[i];
+        }
+        if (점구름) {
+          let pos = 점구름.geometry.getAttribute('position');
+          pos.array.set(원래위치);
+          pos.needsUpdate = true;
+        }
+      }
+
+      // 기억 사진들도 즉각 숨김
+      for (let i = 0; i < 사진스프라이트들.length; i++) {
+        사진스프라이트들[i].material.opacity = 0.0;
+      }
+
+      리셋누적시간 = 0;
+      리셋쿨다운 = 1.0; // 1초간 재인식 쿨다운
+
+      // UI 피드백
+      document.getElementById('reset-indicator').style.display = 'none';
+      let pointer = document.getElementById('finger-pointer');
+      if (pointer) pointer.style.display = 'none';
+
+      let dot = document.getElementById('hand-dot');
+      let label = document.getElementById('hand-label');
+      dot.className = 'ready';
+      label.innerText = '✨ 전체 초기화 완료';
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       ★ 웹캠 손 추적 업데이트
+    ────────────────────────────────────────────────────────────── */
+    function 손추적업데이트(delta) {
+      let 모래흐름사운드필요 = false;
+      let 손가락유지확인됨 = false;
+      사진손가락호버 = null;
+      한손가락흐름활성 = false;
+      한손가락흐름이번프레임갱신됨 = false;
+      if (손가락표시도트) 손가락표시도트.visible = false;
+      if (리셋쿨다운 > 0) {
+        리셋쿨다운 -= delta;
+      }
+
+      let video = document.getElementById('webcam');
+      let hand준비 = handLandmarker && video && video.readyState >= 2;
+      let dot = document.getElementById('hand-dot');
+      let label = document.getElementById('hand-label');
+      let resetBox = document.getElementById('reset-indicator');
+      let circle = document.getElementById('reset-progress-circle');
+      let resetTxt = document.getElementById('reset-time');
+      let pointer = document.getElementById('finger-pointer');
+      const 반경원 = document.getElementById('finger-radius-ring');
+      if (반경원) 반경원.style.display = 'none';
+
+      let 리셋조건만족 = false;
+
+      if (hand준비) {
+        let results = handLandmarker.detectForVideo(video, performance.now());
+
+        if (results.landmarks && results.landmarks.length > 0) {
+          let 손개수 = results.landmarks.length;
+
+          // ────────────────────────────────────────────────────────
+          // [A] 두 손 감지된 경우 (리셋 vs 두 손 펼침)
+          // ────────────────────────────────────────────────────────
+          if (손개수 >= 2) {
+            이전한손주먹상태 = false;
+            if (pointer) pointer.style.display = 'none';
+
+            let lm1 = results.landmarks[0];
+            let lm2 = results.landmarks[1];
+
+            let 손1 = 손가락분석(lm1);
+            let 손2 = 손가락분석(lm2);
+
+            // 두 손 중심 간 거리 (정규화 좌표)
+            let 손1중심 = lm1[9]; // 중지 관절 부근
+            let 손2중심 = lm2[9];
+            let 두손거리 = 거리(손1중심, 손2중심);
+
+            // ── 4. 전체 리셋: 두 손을 가까이 모아 2초간 유지 ───────
+            if (두손거리 < 0.22 && 리셋쿨다운 <= 0) {
+              리셋조건만족 = true;
+              리셋누적시간 += delta;
+
+              let 진행률 = Math.min(1.0, 리셋누적시간 / 2.0);
+              resetBox.style.display = 'flex';
+
+              let offset = 326.7 - (326.7 * 진행률);
+              circle.style.strokeDashoffset = offset;
+              resetTxt.innerText = `${리셋누적시간.toFixed(1)}s / 2.0s`;
+
+              dot.className = 'reset';
+              label.innerText = `🤲 두 손 모으기 — 리셋 중 (${Math.round(진행률 * 100)}%)`;
+
+              if (리셋누적시간 >= 2.0) {
+                손가락버튼유지초기화();
+                전체리셋실행();
+                return;
+              }
+
+              이전손X = null; 이전손Y = null;
+            }
+            // ── 3. 두 손 손바닥 펼치기: 영구 흩뜨리기 ───────────────
+            else if (두손거리 >= 0.24 && 손1.활짝 && 손2.활짝 && 리셋쿨다운 <= 0) {
+              두손펼침누적시간 += delta;
+
+              if (두손펼침누적시간 >= 0.35 && !두손영구고정 && !두손트리거락) {
+                두손영구고정 = true;
+                기억사운드랜덤재생();
+                let handLink = document.getElementById('hand-next-link');
+                if (handLink) handLink.classList.add('is-scattered-hidden');
+                const filmStrip = document.getElementById('left-film-strip');
+                if (filmStrip) filmStrip.classList.add('is-scattered-hidden');
+                목표흩어짐강도 = 3.0;
+                두손트리거락 = true;
+              }
+
+              dot.className = 'super';
+              label.innerText = '🖐🖐 두 손 펼침 — 사방으로 영구 흩어짐!';
+              이전손X = null; 이전손Y = null;
+            } else {
+              if (!손1.활짝 || !손2.활짝) {
+                두손트리거락 = false;
+              }
+              두손펼침누적시간 = 0;
+              이전손X = null; 이전손Y = null;
+            }
+          }
+          // ────────────────────────────────────────────────────────
+          // [B] 한 손만 감지된 경우 (한 손가락 퍼짐 / 주먹 정지 / 손바닥 회전)
+          // ────────────────────────────────────────────────────────
+          else {
+            두손트리거락 = false;
+            두손펼침누적시간 = 0;
+
+            let lm = results.landmarks[0];
+            let 상태 = 손가락분석(lm);
+            let 손목 = lm[0];
+
+            // ── ★ 한 손가락: 입자 사르르 퍼뜨리기 ───────────────────
+            if (상태.한손가락만) {
+              이전한손주먹상태 = false;
+              // 전체가 흩어지지 않도록 국소 중력 흐름만 켭니다.
+
+              // 검지 끝점(8번) 화면 위치 포인터 표시
+              let 검지끝 = lm[8];
+              let 화면X = (1 - 검지끝.x) * window.innerWidth;
+              let 화면Y = 검지끝.y * window.innerHeight;
+              손가락반경표시(화면X, 화면Y, true);
+              손가락유지확인됨 = true;
+              손가락버튼유지업데이트(화면X, 화면Y, delta);
+
+              if (!두손영구고정) {
+                모래흐름사운드필요 = !!점구름;
+                목표흩어짐강도 = 0.0;
+                한손가락흐름활성 = 손가락위치를갱신(화면X, 화면Y);
+              }
+
+              if (pointer) {
+                pointer.style.display = 'block';
+                pointer.style.left = 화면X + 'px';
+                pointer.style.top = 화면Y + 'px';
+              }
+
+              // 회전은 부드럽게 감속 유지
+              회전속도X *= 0.85;
+              회전속도Y *= 0.85;
+              이전손X = null; 이전손Y = null;
+
+              dot.className = 'rotate';
+              label.innerText = '☝️ 한 손가락 — 입자 사르르 퍼지는 중';
+            }
+            // ── 2. 한 손 주먹 쥐기: 회전을 멈추고 현재 각도 유지 ────
+            else if (상태.주먹) {
+              이전한손주먹상태 = true;
+              if (pointer) pointer.style.display = 'none';
+
+              // 한손가락으로 퍼뜨렸던 입자도 주먹 쥐면 원래대로 복원 (영구고정이 아닐 때)
+              if (!두손영구고정) {
+                목표흩어짐강도 = 0.0;
+              }
+
+              회전속도X = 0;
+              회전속도Y = 0;
+              이전손X = 1 - 손목.x;
+              이전손Y = 손목.y;
+
+              dot.className = 'fist';
+              label.innerText = '✊ 주먹 — 회전 정지 및 각도 유지';
+            }
+            // ── 1. 한 손 손바닥 펼치기 + 이동: 부드러운 회전 ────────
+            else if (상태.활짝) {
+              이전한손주먹상태 = false;
+              if (pointer) pointer.style.display = 'none';
+
+              if (!두손영구고정) {
+                목표흩어짐강도 = 0.0;
+              }
+
+              let 현재손X = 1 - 손목.x;
+              let 현재손Y = 손목.y;
+
+              if (이전손X !== null && 이전손Y !== null && 점구름) {
+                let 델타X = 현재손X - 이전손X;
+                let 델타Y = 현재손Y - 이전손Y;
+
+                if (Math.abs(델타X) < 0.15 && Math.abs(델타Y) < 0.15) {
+                  회전속도Y += 델타X * 손회전감도;
+                  회전속도X += 델타Y * 손회전감도;
+                }
+              }
+
+              이전손X = 현재손X;
+              이전손Y = 현재손Y;
+
+              dot.className = 'rotate';
+              label.innerText = 두손영구고정 ? '🖐 흩어진 상태로 부드럽게 회전 중' : '🖐 손바닥 이동 — 부드러운 회전';
+            } else {
+              if (pointer) pointer.style.display = 'none';
+              if (!두손영구고정) {
+                목표흩어짐강도 = 0.0;
+              }
+              이전손X = 1 - 손목.x;
+              이전손Y = 손목.y;
+              dot.className = 'ready';
+              label.innerText = '손 인식 중';
+            }
+          }
+
+        } else {
+          이전한손주먹상태 = false;
+          // 손 감지 안 됨
+          if (pointer) pointer.style.display = 'none';
+          if (!두손영구고정) {
+            목표흩어짐강도 = 0.0;
+          }
+          이전손X = null; 이전손Y = null;
+          두손트리거락 = false;
+          두손펼침누적시간 = 0;
+          if (!마우스누름) {
+            dot.className = 두손영구고정 ? 'super' : '';
+            label.innerText = 두손영구고정 ? '✨ 영구 흩어짐 유지 중' : '손 또는 마우스를 움직여보세요';
+          }
+        }
+      }
+
+      // 리셋 조건 미충족 시 게이지 숨김 및 초기화
+      if (!손가락유지확인됨) 손가락버튼유지초기화();
+
+      if (!리셋조건만족) {
+        리셋누적시간 = 0;
+        resetBox.style.display = 'none';
+      }
+
+      if (!한손가락흐름이번프레임갱신됨) 한손가락흐름이전중심유효 = false;
+
+      // 두손영구고정 상태면 목표 강도를 항상 3.0으로 고정
+      if (두손영구고정) {
+        목표흩어짐강도 = 3.0;
+      }
+      모래흐름사운드동기화(모래흐름사운드필요);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       ★ 점 위치 업데이트 (영구 흩어짐 및 리셋 복구)
+    ────────────────────────────────────────────────────────────── */
+    function 손가락반경표시(화면X, 화면Y, 표시) {
+      const ring = document.getElementById('finger-radius-ring');
+      if (!ring) return;
+      if (!표시 || !카메라) {
+        ring.style.display = 'none';
+        return;
+      }
+      const 카메라거리 = Math.max(0.1, 카메라.position.distanceTo(new THREE.Vector3(0, 0, 0)));
+      const 시야높이 = 2 * 카메라거리 * Math.tan(THREE.MathUtils.degToRad(카메라.fov / 2));
+      const 원지름 = Math.max(24, (2 * 한손가락반경월드 / 시야높이) * window.innerHeight);
+      ring.style.setProperty('--finger-radius-size', 원지름 + 'px');
+      ring.style.left = 화면X + 'px';
+      ring.style.top = 화면Y + 'px';
+      ring.style.display = 'block';
+    }
+    function 손가락위치를갱신(화면X, 화면Y) {
+      if (!점구름 || !카메라 || !손가락광선추적기 || !손가락평면 || !손가락교차점) return false;
+      손가락NDC.set((화면X / window.innerWidth) * 2 - 1, 1 - (화면Y / window.innerHeight) * 2);
+      손가락광선추적기.setFromCamera(손가락NDC, 카메라);
+      if (!손가락광선추적기.ray.intersectPlane(손가락평면, 손가락교차점)) return false;
+      점구름.updateMatrixWorld(true);
+      점구름.updateMatrixWorld(true);
+      점구름.worldToLocal(손가락교차점);
+      if (한손가락흐름이전중심유효) {
+        한손가락흐름이전중심.copy(한손가락흐름중심);
+      } else {
+        한손가락흐름이전중심.copy(손가락교차점);
+        한손가락흐름이전중심유효 = true;
+      }
+      한손가락흐름중심.copy(손가락교차점);
+      손가락도트월드위치.copy(손가락교차점);
+      점구름.localToWorld(손가락도트월드위치);
+      손가락표시도트.position.copy(손가락도트월드위치);
+      손가락표시도트.visible = true;
+      한손가락흐름이번프레임갱신됨 = true;
+      return true;
+    }
+
+    function 점위치업데이트(delta) {
+      if (!점구름 || !원래위치 || 점수 === 0) return;
+
+      현재흩어짐강도 += (목표흩어짐강도 - 현재흩어짐강도) * 0.08;
+
+      let geo = 점구름.geometry;
+      let pos = geo.getAttribute('position');
+      let posArray = pos.array;
+      let 스케일 = Math.max(점구름.scale.x, 0.0001);
+      let 실시간힘 = (두손흩어지는힘 * (현재흩어짐강도 / 3.0)) / 스케일;
+      let 반경 = 한손가락반경월드 / 스케일;
+      let 반경제곱 = 반경 * 반경;
+      let 최대낙하 = 모래낙하최대월드 / 스케일;
+      let 중력 = 4.8 / 스케일;
+      let 국소흐름 = 한손가락흐름활성 && !두손영구고정 && 한손가락흐름오프셋 && 한손가락흐름속도;
+      let 감쇠 = Math.pow(0.9, delta * 60);
+
+      for (let i = 0; i < 점수; i++) {
+        let i3 = i * 3;
+        let 원본X = 원래위치[i3];
+        let 원본Y = 원래위치[i3 + 1];
+        let 원본Z = 원래위치[i3 + 2];
+
+        if (국소흐름 && ((i * 17) % 5) < 4) {
+          let 이동X = 한손가락흐름중심.x - 한손가락흐름이전중심.x;
+          let 이동Y = 한손가락흐름중심.y - 한손가락흐름이전중심.y;
+          let 이동길이제곱 = 이동X * 이동X + 이동Y * 이동Y;
+          let 진행률 = 이동길이제곱 > 0.000001
+            ? Math.max(0, Math.min(1, ((원본X - 한손가락흐름이전중심.x) * 이동X + (원본Y - 한손가락흐름이전중심.y) * 이동Y) / 이동길이제곱))
+            : 1;
+          let 가장가까운X = 한손가락흐름이전중심.x + 이동X * 진행률;
+          let 가장가까운Y = 한손가락흐름이전중심.y + 이동Y * 진행률;
+          let dx = 원본X - 가장가까운X;
+          let dy = 원본Y - 가장가까운Y;
+          let dz = 원본Z - 한손가락흐름중심.z;
+          let 거리제곱 = dx * dx + dy * dy; // 화면에 겹쳐 보이는 앞·뒤 깊이의 입자도 함께 무너지게 합니다.
+          if (거리제곱 < 반경제곱) {
+            let 가중치 = 1 - Math.sqrt(거리제곱) / 반경;
+            let 수평거리 = Math.sqrt(dx * dx + dz * dz) || 1;
+            한손가락흐름속도[i3] += (dx / 수평거리) * 0.18 * 가중치 * delta / 스케일;
+            한손가락흐름속도[i3 + 1] = Math.max(-3.0 / 스케일, 한손가락흐름속도[i3 + 1] - 중력 * 가중치 * delta);
+            한손가락흐름속도[i3 + 2] += (dz / 수평거리) * 0.18 * 가중치 * delta / 스케일;
+
+            한손가락흐름오프셋[i3] = Math.max(-0.16 / 스케일, Math.min(0.16 / 스케일, 한손가락흐름오프셋[i3] + 한손가락흐름속도[i3] * delta));
+            한손가락흐름오프셋[i3 + 1] = Math.max(-최대낙하, 한손가락흐름오프셋[i3 + 1] + 한손가락흐름속도[i3 + 1] * delta);
+            한손가락흐름오프셋[i3 + 2] = Math.max(-0.16 / 스케일, Math.min(0.16 / 스케일, 한손가락흐름오프셋[i3 + 2] + 한손가락흐름속도[i3 + 2] * delta));
+            if (한손가락흐름오프셋[i3 + 1] <= -최대낙하) 한손가락흐름속도[i3 + 1] = 0;
+          }
+        }
+
+        if (!국소흐름 || !((i * 17) % 5 < 2)) {
+          한손가락흐름속도[i3] *= 감쇠;
+          한손가락흐름속도[i3 + 1] *= 감쇠;
+          한손가락흐름속도[i3 + 2] *= 감쇠;
+        }
+
+        let 목표X = 원본X + 날아갈방향[i3] * 실시간힘 + (한손가락흐름오프셋 ? 한손가락흐름오프셋[i3] : 0);
+        let 목표Y = 원본Y + 날아갈방향[i3 + 1] * 실시간힘 + (한손가락흐름오프셋 ? 한손가락흐름오프셋[i3 + 1] : 0);
+        let 목표Z = 원본Z + 날아갈방향[i3 + 2] * 실시간힘 + (한손가락흐름오프셋 ? 한손가락흐름오프셋[i3 + 2] : 0);
+
+        현재위치[i3] += (목표X - 현재위치[i3]) * 복원속도;
+        현재위치[i3 + 1] += (목표Y - 현재위치[i3 + 1]) * 복원속도;
+        현재위치[i3 + 2] += (목표Z - 현재위치[i3 + 2]) * 복원속도;
+
+        posArray[i3] = 현재위치[i3];
+        posArray[i3 + 1] = 현재위치[i3 + 1];
+        posArray[i3 + 2] = 현재위치[i3 + 2];
+      }
+
+      pos.needsUpdate = true;
+    }
+    /* ──────────────────────────────────────────────────────────────
+       ★ 모델 회전 및 부드러운 감속
+    ────────────────────────────────────────────────────────────── */
+    function 모델회전업데이트() {
+      if (!점구름) return;
+
+      // 회전 속도 적용
+      점구름.rotation.y += 회전속도Y;
+      점구름.rotation.x += 회전속도X;
+
+      // 손/마우스를 멈추면 부드럽게 감속 (관성 감속)
+      회전속도Y *= 관성감속비율;
+      회전속도X *= 관성감속비율;
+
+      if (Math.abs(회전속도X) < 0.0001) 회전속도X = 0;
+      if (Math.abs(회전속도Y) < 0.0001) 회전속도Y = 0;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       애니메이션 루프
+    ────────────────────────────────────────────────────────────── */
+    function 애니메이션루프(현재시간) {
+      requestAnimationFrame(애니메이션루프);
+
+      let delta = Math.min((현재시간 - 이전시간) / 1000, 0.05);
+      이전시간 = 현재시간;
+
+      손추적업데이트(delta);
+      점위치업데이트(delta);
+      모델회전업데이트();
+      카메라.lookAt(0, 0, 0);
+      기억사진업데이트(현재시간);
+      렌더러.render(장면, 카메라);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       마우스 이벤트
+    ────────────────────────────────────────────────────────────── */
+    function 마우스이벤트연결() {
+      window.addEventListener('mousedown', function (e) {
+        마우스누름 = true;
+        마우스드래그됨 = false;
+        마우스시작X = e.clientX;
+        마우스시작Y = e.clientY;
+        마우스클릭대상허용 = !e.target.closest('button, a, input, select, textarea, [role="button"]');
+        마우스이전X = e.clientX;
+        마우스이전Y = e.clientY;
+      });
+
+      window.addEventListener('mousemove', function (e) {
+        마우스화면X = e.clientX;
+        마우스화면Y = e.clientY;
+
+        if (마우스누름 && 점구름) {
+          let 델타X = e.clientX - 마우스이전X;
+          let 델타Y = e.clientY - 마우스이전Y;
+
+          if (Math.hypot(e.clientX - 마우스시작X, e.clientY - 마우스시작Y) > 5) 마우스드래그됨 = true;
+          회전속도Y += 델타X * 마우스회전감도;
+          회전속도X += 델타Y * 마우스회전감도;
+        }
+
+        마우스이전X = e.clientX;
+        마우스이전Y = e.clientY;
+      });
+
+      window.addEventListener('mousemove', function (e) {
+        const photoReader = document.getElementById('photo-reader');
+        let overPhoto = false;
+        if (두손영구고정 && !(photoReader && photoReader.classList.contains('is-open'))) {
+          사진마우스호버 = 기억사진선택(e.clientX, e.clientY);
+          overPhoto = !!사진마우스호버;
+        }
+        if (!overPhoto) 사진마우스호버 = null; document.body.style.cursor = overPhoto ? 'pointer' : '';
+      });
+      window.addEventListener('mouseleave', function () {
+        document.body.style.cursor = '';
+        사진마우스호버 = null;
+      });
+      window.addEventListener('mouseup', function (e) {
+        const photoReader = document.getElementById('photo-reader');
+        if (마우스누름 && 마우스클릭대상허용 && !마우스드래그됨 && 두손영구고정 &&
+          !(photoReader && photoReader.classList.contains('is-open'))) {
+          const photo = 기억사진선택(e.clientX, e.clientY);
+          if (photo) 사진리더열기(photo);
+        }
+        마우스누름 = false;
+        마우스클릭대상허용 = false;
+      });
+
+      window.addEventListener('mouseleave', function () {
+        마우스누름 = false;
+      });
+
+      window.addEventListener('wheel', function (e) {
+        카메라.position.z += e.deltaY * 0.005;
+        카메라.position.z = Math.max(1.5, Math.min(15, 카메라.position.z));
+      }, { passive: true });
+
+      window.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       키보드 단축키 연결 (R: 전체 리셋 비상용)
+    ────────────────────────────────────────────────────────────── */
+    function 키보드이벤트연결() {
+      window.addEventListener('keydown', function (e) {
+        if (e.key === 'r' || e.key === 'R' || e.key === 'ㄱ') {
+          전체리셋실행();
+        }
+      });
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       웹캠 시작
+    ────────────────────────────────────────────────────────────── */
+    function 웹캠시작() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('hint-webcam').style.display = 'block';
+        document.getElementById('hand-label').innerText = '마우스 모드';
+        return;
+      }
+
+      navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
+        .then(function (stream) {
+          let video = document.getElementById('webcam');
+          let wrapper = document.getElementById('webcam-wrapper');
+          video.srcObject = stream;
+          video.onloadedmetadata = function () {
+            video.play();
+            웹캠크기조절();
+            wrapper.style.display = 'block';
+            wrapper.style.opacity = String(웹캠투명도);
+            if (웹캠흑백) { video.style.filter = 'grayscale(100%)'; }
+            MediaPipe초기화();
+          };
+        })
+        .catch(function (err) {
+          console.warn('웹캠 접근 실패:', err);
+          document.getElementById('hint-webcam').style.display = 'block';
+          document.getElementById('hand-label').innerText = '마우스 모드';
+        });
+    }
+
+    function 웹캠크기조절() {
+      let video = document.getElementById('webcam');
+      let wrapper = document.getElementById('webcam-wrapper');
+      let 너비 = window.innerWidth * 웹캠크기비율;
+      let 비율 = (video.videoWidth && video.videoHeight)
+        ? video.videoWidth / video.videoHeight : 4 / 3;
+      wrapper.style.width = 너비 + 'px';
+      wrapper.style.height = (너비 / 비율) + 'px';
+      video.style.width = '100%';
+      video.style.height = '100%';
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       드래그 앤 드롭 파일 로드
+    ────────────────────────────────────────────────────────────── */
+    function 드래그드롭이벤트연결() {
+      let dropZone = document.getElementById('drop-zone');
+      let fileInput = document.getElementById('file-input');
+
+      dropZone.addEventListener('click', function () { fileInput.click(); });
+      fileInput.addEventListener('change', function (e) {
+        if (e.target.files.length > 0) { PLY파일읽기(e.target.files[0]); }
+      });
+      dropZone.addEventListener('dragover', function (e) {
+        e.preventDefault(); dropZone.classList.add('drag-over');
+      });
+      dropZone.addEventListener('dragleave', function () {
+        dropZone.classList.remove('drag-over');
+      });
+      dropZone.addEventListener('drop', function (e) {
+        e.preventDefault(); dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0) { PLY파일읽기(e.dataTransfer.files[0]); }
+      });
+      window.addEventListener('dragover', function (e) { e.preventDefault(); });
+      window.addEventListener('drop', function (e) {
+        e.preventDefault();
+        if (e.dataTransfer.files.length > 0) { PLY파일읽기(e.dataTransfer.files[0]); }
+      });
+    }
+
+    function PLY파일읽기(file) {
+      if (!file.name.toLowerCase().endsWith('.ply')) {
+        상태메시지('⚠ .ply 파일만 불러올 수 있어요.');
+        return;
+      }
+      상태메시지('불러오는 중…');
+      document.getElementById('drop-zone').style.display = 'none';
+
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          let loader = new THREE.PLYLoader();
+          let geometry = loader.parse(e.target.result);
+          전체리셋실행();
+          현재놀이터인덱스 = -1;
+          UI업데이트();
+          PLY점구름만들기(geometry);
+          알림메시지표시('📁 외부 파일 로드됨: ' + file.name);
+        } catch (err) {
+          상태메시지('⚠ 파일 읽기 오류: ' + err.message);
+          document.getElementById('drop-zone').style.display = 'block';
+        }
+      };
+      reader.onerror = function () {
+        상태메시지('⚠ 파일을 읽지 못했어요.');
+        document.getElementById('drop-zone').style.display = 'block';
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function 상태메시지(텍스트) {
+      let el = document.getElementById('status-msg');
+      if (텍스트 === '') {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'block';
+        el.innerText = 텍스트;
+      }
+    }
+  </script>
+</body>
+
+</html>

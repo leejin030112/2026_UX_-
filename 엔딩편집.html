@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>안녕 — 엔딩 장면 편집</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0a0804;color:#fff;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif}#tiles{position:fixed;inset:0;display:grid;grid-template-columns:repeat(var(--cols,10),minmax(0,1fr));grid-template-rows:repeat(var(--rows,6),minmax(0,1fr));gap:6px;overflow:hidden}.tile{width:100%;height:100%;object-fit:cover}.camera-hole{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:22vw;aspect-ratio:4/3;background:#0a0804;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.45);font-size:12px;letter-spacing:.08em;pointer-events:none}.objects{position:fixed;inset:0;pointer-events:none}.object{position:absolute;height:auto;object-fit:contain;transform:translate(-50%,-50%) scale(var(--scale,1)) rotate(var(--rotation,0deg));transform-origin:center;cursor:grab;pointer-events:auto;touch-action:none;user-select:none;transition:filter .15s}.object.selected{outline:1px dashed rgba(255,255,255,.9);cursor:grabbing}.panel{position:fixed;right:18px;top:18px;bottom:18px;width:min(340px,calc(100vw - 36px));z-index:10;background:rgba(10,8,4,.92);border:1px solid rgba(255,255,255,.22);padding:18px;overflow:auto;backdrop-filter:blur(10px)}h1{font-size:19px;margin:0 0 8px;color:#fff}.intro{font-size:12px;line-height:1.7;color:rgba(255,255,255,.7);margin:0 0 16px}.field{display:grid;grid-template-columns:1fr 100px;align-items:center;gap:8px;margin:11px 0;font-size:13px;color:#fff}.field input,.field select{width:100%;background:#171512;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:7px}.row{display:flex;gap:8px;margin:14px 0}.row button{flex:1;background:#222;color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:4px;padding:9px 7px;cursor:pointer}.row button:hover{background:#333}.hint{font-size:11px;line-height:1.7;color:rgba(255,255,255,.58);border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:13px}textarea{width:100%;height:175px;margin-top:8px;background:#111;color:#eee;border:1px solid rgba(255,255,255,.22);padding:8px;font:11px/1.5 Consolas,monospace;resize:vertical}.back{color:#fff;text-decoration:none;font-size:12px}.final-look{position:fixed;inset:0;z-index:6;opacity:0;pointer-events:none;background:rgba(10,8,4,.25);backdrop-filter:blur(12px) brightness(.65);transition:opacity 1s}.final-look.active{opacity:1}.final-copy{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:clamp(20px,3vw,38px);line-height:1.7;letter-spacing:.06em;text-shadow:0 2px 10px #000}.final-toggle{position:fixed;left:18px;top:18px;z-index:12;background:rgba(10,8,4,.8);border:1px solid rgba(255,255,255,.35);border-radius:4px;color:white;padding:9px 12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="tiles" aria-hidden="true"></div>
+<div class="camera-hole">카메라 영역</div>
+<div class="objects" id="objects"></div>
+<button class="final-toggle" id="final-toggle">엔딩 문구 미리보기</button>
+<div class="final-look" id="final-look"><div class="final-copy">우리의 안녕과 모래는<br>포장타일 밑에 존재한다</div></div>
+<aside class="panel">
+  <h1>엔딩 장면 편집</h1>
+  <p class="intro">사진을 드래그해 위치를 바꾸고, 마우스 휠로 크기를 조절하세요. 오른쪽 값을 바꾸면 미리보기에 바로 반영됩니다.</p>
+  <label class="field"><span>선택 이미지</span><select id="item-select"></select></label>
+  <label class="field"><span>가로 위치 (%)</span><input id="x-input" type="number" step="0.1"></label>
+  <label class="field"><span>세로 위치 (%)</span><input id="y-input" type="number" step="0.1"></label>
+  <label class="field"><span>너비 (vw)</span><input id="width-input" type="number" step="0.5" min="2" max="100"></label>
+  <label class="field"><span>배율</span><input id="scale-input" type="number" step="0.05" min="0.2" max="3"></label>
+  <div class="row"><button id="reset-button">기본 배치</button><button id="copy-button">설정 복사</button></div>
+  <div class="hint">이미지 배치 설정은 아래에서 바로 확인하고 복사할 수 있습니다. 이 설정을 안녕.html의 <b>엔딩이미지배치</b>에 붙여 넣으면 실제 엔딩에도 적용됩니다.<br><br><a class="back" href="안녕.html">← 안녕 페이지</a></div>
+  <textarea id="config-output" readonly spellcheck="false"></textarea>
+</aside>
+<script>
+const defaults={
+  playground:[
+    {src:'p1.png',x:17.137930256538773,y:26.371863388433695,widthVw:34,scale:1.85,jitterX:3,jitterY:3},
+    {src:'p2.png',x:97.38161737488046,y:47.732754817570274,widthVw:36,scale:1.35,jitterX:3,jitterY:3},
+    {src:'p3.png',x:21.210903587588287,y:96.24461156009743,widthVw:25,scale:1.5,jitterX:2,jitterY:4}
+  ],
+  people:[
+    {src:'people1.png',x:78.7680952892786,y:77.69741203170565,widthVw:13.5,scale:1.05,jitterX:4,jitterY:3},
+    {src:'people2.png',x:24.291737844412154,y:44.00601134800834,widthVw:14,scale:1.35,jitterX:3,jitterY:3},
+    {src:'people3.png',x:57.163829639562806,y:13.792152704135741,widthVw:17.5,scale:.7,jitterX:3,jitterY:4},
+    {src:'people4.png',x:72.96174938612788,y:13.374333985410594,widthVw:29,scale:1,jitterX:4,jitterY:3}
+  ]
+};
+let settings=structuredClone(defaults);let selectedKey='playground:0';let dragState=null;const tileRoot=document.getElementById('tiles');const objects=document.getElementById('objects');const select=document.getElementById('item-select');const fields={x:document.getElementById('x-input'),y:document.getElementById('y-input'),widthVw:document.getElementById('width-input'),scale:document.getElementById('scale-input')};
+function allItems(){return [...settings.playground.map((item,i)=>({item,key:`playground:${i}`,label:`P${i+1}`})),...settings.people.map((item,i)=>({item,key:`people:${i}`,label:`people${i+1}`}))]}
+function current(){return allItems().find(entry=>entry.key===selectedKey)}
+function buildTiles(){const gap=6,size=Math.max(88,Math.min(150,Math.round(innerWidth/11))),cols=Math.ceil(innerWidth/size),rows=Math.ceil(innerHeight/size),cellW=(innerWidth-gap*(cols-1))/cols,cellH=(innerHeight-gap*(rows-1))/rows;tileRoot.style.setProperty('--cols',cols);tileRoot.style.setProperty('--rows',rows);tileRoot.replaceChildren();const cw=innerWidth*.22,ch=cw*.75,cl=(innerWidth-cw)/2,ct=(innerHeight-ch)/2;for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const l=c*(cellW+gap),t=r*(cellH+gap),over=l<cl+cw+6&&l+cellW>cl-6&&t<ct+ch+6&&t+cellH>ct-6;if(over)continue;const image=document.createElement('img');image.className='tile';image.src=`p${1+Math.floor(Math.random()*4)}.jpg`;image.style.gridColumn=String(c+1);image.style.gridRow=String(r+1);tileRoot.appendChild(image)}}
+function makeSelect(){const entries=allItems();if(select.options.length===entries.length){select.value=selectedKey;return}select.replaceChildren();for(const entry of entries){const option=document.createElement('option');option.value=entry.key;option.textContent=entry.label;select.appendChild(option)}select.value=selectedKey}
+function draw(){const entries=allItems();if(objects.children.length!==entries.length){objects.replaceChildren();for(const entry of entries){const image=document.createElement('img');image.className='object';image.dataset.key=entry.key;image.src=entry.item.src;image.alt=entry.item.src;image.draggable=false;image.addEventListener('pointerdown',startDrag);image.addEventListener('wheel',resizeByWheel,{passive:false});objects.appendChild(image)}}entries.forEach((entry,index)=>{const image=objects.children[index];image.dataset.key=entry.key;image.classList.toggle('selected',entry.key===selectedKey);image.style.left=entry.item.x+'%';image.style.top=entry.item.y+'%';image.style.width=entry.item.widthVw+'vw';image.style.setProperty('--scale',entry.item.scale)});makeSelect();syncFields();document.getElementById('config-output').value='const 엔딩이미지배치 = '+JSON.stringify(settings,null,2)+';'}function syncFields(){const entry=current();if(!entry)return;for(const key of Object.keys(fields))fields[key].value=entry.item[key]}
+function updateField(key,value){const entry=current();if(!entry)return;entry.item[key]=Number(value);if(key==='x'||key==='y')entry.item[key]=Math.max(0,Math.min(100,entry.item[key]));if(key==='widthVw')entry.item[key]=Math.max(2,Math.min(100,entry.item[key]));if(key==='scale')entry.item[key]=Math.max(.2,Math.min(3,entry.item[key]));draw()}
+function startDrag(event){event.preventDefault();selectedKey=event.currentTarget.dataset.key;const entry=current();dragState={startX:event.clientX,startY:event.clientY,x:entry.item.x,y:entry.item.y};event.currentTarget.setPointerCapture(event.pointerId);draw()}
+window.addEventListener('pointermove',event=>{if(!dragState)return;const entry=current();entry.item.x=Math.max(0,Math.min(100,dragState.x+(event.clientX-dragState.startX)/innerWidth*100));entry.item.y=Math.max(0,Math.min(100,dragState.y+(event.clientY-dragState.startY)/innerHeight*100));draw()});window.addEventListener('pointerup',()=>dragState=null);
+function resizeByWheel(event){event.preventDefault();selectedKey=event.currentTarget.dataset.key;const entry=current();entry.item.widthVw=Math.max(2,Math.min(100,entry.item.widthVw*(event.deltaY<0?1.05:.95)));draw()}
+select.addEventListener('change',()=>{selectedKey=select.value;draw()});for(const [key,input] of Object.entries(fields))input.addEventListener('input',()=>updateField(key,input.value));document.getElementById('reset-button').addEventListener('click',()=>{settings=structuredClone(defaults);draw()});document.getElementById('copy-button').addEventListener('click',async()=>{const text=document.getElementById('config-output').value;try{await navigator.clipboard.writeText(text);document.getElementById('copy-button').textContent='복사 완료'}catch{const area=document.getElementById('config-output');area.focus();area.select();document.execCommand('copy')}});document.getElementById('final-toggle').addEventListener('click',()=>document.getElementById('final-look').classList.toggle('active'));window.addEventListener('resize',buildTiles);buildTiles();draw();
+</script>
+</body>
+</html>
